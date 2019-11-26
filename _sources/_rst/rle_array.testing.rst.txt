@@ -1,0 +1,7 @@
+rle\_array.testing module
+=========================
+
+.. automodule:: rle_array.testing
+   :members:
+   :undoc-members:
+   :show-inheritance:

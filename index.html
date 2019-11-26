@@ -1,0 +1,380 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>rle-array &#8212; rle-array  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="rle_array" href="_rst/modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="rle-array">
+<h1><a class="toc-backref" href="#id1">rle-array</a><a class="headerlink" href="#rle-array" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://github.com/JDASoftwareGroup/rle-array/actions?query=branch%3Amaster+workflow%3ACI"><img alt="Build Status" src="https://github.com/JDASoftwareGroup/rle-array/workflows/CI/badge.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/JDASoftwareGroup/rle-array"><img alt="Coverage Status" src="https://codecov.io/gh/JDASoftwareGroup/rle-array/branch/master/graph/badge.svg?token=y2q96vlHqc" /></a>
+<p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/development/extending.html#extensionarray">Extension Array</a> for <a class="reference external" href="https://pandas.pydata.org/">Pandas</a> that implements <a class="reference external" href="https://en.wikipedia.org/wiki/Run-length_encoding">Run-length Encoding</a>.</p>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title first">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#rle-array" id="id1">rle-array</a></p>
+<ul>
+<li><p><a class="reference internal" href="#quick-start" id="id2">Quick Start</a></p></li>
+<li><p><a class="reference internal" href="#development-plan" id="id3">Development Plan</a></p></li>
+<li><p><a class="reference internal" href="#implementation" id="id4">Implementation</a></p></li>
+<li><p><a class="reference internal" href="#license" id="id5">License</a></p></li>
+<li><p><a class="reference internal" href="#contents" id="id6">Contents</a></p></li>
+<li><p><a class="reference internal" href="#indices-and-tables" id="id7">Indices and tables</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="quick-start">
+<h2><a class="toc-backref" href="#id2">Quick Start</a><a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>Some basic setup first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_rows&quot;</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.width&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We need some example data, so let’s create some pseudo-weather data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rle_array.testing</span> <span class="k">import</span> <span class="n">generate_example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">generate_example</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">        date  month  year    city    country   avg_temp   rain   mood</span>
+<span class="go">0 2000-01-01      1  2000  city_0  country_0  12.400000  False     ok</span>
+<span class="go">1 2000-01-02      1  2000  city_0  country_0   4.000000  False     ok</span>
+<span class="go">2 2000-01-03      1  2000  city_0  country_0  17.200001  False  great</span>
+<span class="go">3 2000-01-04      1  2000  city_0  country_0   8.400000  False     ok</span>
+<span class="go">4 2000-01-05      1  2000  city_0  country_0   6.400000  False     ok</span>
+<span class="go">5 2000-01-06      1  2000  city_0  country_0  14.400000  False     ok</span>
+<span class="go">6 2000-01-07      1  2000  city_0  country_0  14.300000   True     ok</span>
+<span class="go">7 2000-01-08      1  2000  city_0  country_0   6.800000  False     ok</span>
+<span class="go">8 2000-01-09      1  2000  city_0  country_0  10.100000  False     ok</span>
+<span class="go">9 2000-01-10      1  2000  city_0  country_0  -1.200000  False     ok</span>
+</pre></div>
+</div>
+<p>Due to the large number of attributes for locations and the date, the data size is quite large:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span>
+<span class="go">Index            128</span>
+<span class="go">date        32000000</span>
+<span class="go">month        4000000</span>
+<span class="go">year         8000000</span>
+<span class="go">city        32000000</span>
+<span class="go">country     32000000</span>
+<span class="go">avg_temp    16000000</span>
+<span class="go">rain         4000000</span>
+<span class="go">mood        32000000</span>
+<span class="go">dtype: int64</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="go">160000128</span>
+</pre></div>
+</div>
+<p>To compress the data, we can use <code class="docutils literal notranslate"><span class="pre">rle-array</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">rle_array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df_rle</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span>
+<span class="gp">... </span>    <span class="s2">&quot;city&quot;</span><span class="p">:</span> <span class="s2">&quot;RLEDtype[object]&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;RLEDtype[object]&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="s2">&quot;RLEDtype[int8]&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;mood&quot;</span><span class="p">:</span> <span class="s2">&quot;RLEDtype[object]&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;rain&quot;</span><span class="p">:</span> <span class="s2">&quot;RLEDtype[bool]&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="s2">&quot;RLEDtype[int16]&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df_rle</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span>
+<span class="go">Index            128</span>
+<span class="go">date        32000000</span>
+<span class="go">month        1188000</span>
+<span class="go">year          120000</span>
+<span class="go">city           32000</span>
+<span class="go">country           64</span>
+<span class="go">avg_temp    16000000</span>
+<span class="go">rain         6489477</span>
+<span class="go">mood        17153296</span>
+<span class="go">dtype: int64</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df_rle</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="go">72982965</span>
+</pre></div>
+</div>
+<p>This works better the longer the runs are. In the above example, it does not work too well for <code class="docutils literal notranslate"><span class="pre">&quot;rain&quot;</span></code>.</p>
+</div>
+<div class="section" id="development-plan">
+<h2><a class="toc-backref" href="#id3">Development Plan</a><a class="headerlink" href="#development-plan" title="Permalink to this headline">¶</a></h2>
+<p>The development of <code class="docutils literal notranslate"><span class="pre">rle-array</span></code> has the following priorities (in decreasing order):</p>
+<ol class="arabic simple">
+<li><p><strong>Correctness:</strong> All results must be correct. The <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>-provided test suite must pass. Approximation are not
+allowed.</p></li>
+<li><p><strong>Transparency:</strong> The user can use <a class="reference internal" href="_rst/rle_array.html#rle_array.RLEDtype" title="rle_array.RLEDtype"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLEDtype</span></code></a> and <a class="reference internal" href="_rst/rle_array.html#rle_array.RLEArray" title="rle_array.RLEArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLEArray</span></code></a> like other <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>
+types. No special parameters or extra functions are required.</p></li>
+<li><p><strong>Features:</strong> Support all features that <a class="reference external" href="https://pandas.pydata.org/">Pandas</a> offers, even if it is slow (but inform the user using a
+<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.errors.PerformanceWarning</span></code></a>).</p></li>
+<li><p><strong>Simplicity:</strong> Do not use <a class="reference external" href="https://docs.python.org/3/extending/building.html">Python C Extensions</a> or <a class="reference external" href="https://cython.org/">Cython</a> (<a class="reference external" href="https://numpy.org/">NumPy</a> and <a class="reference external" href="https://numba.pydata.org/">Numba</a> are allowed).</p></li>
+<li><p><strong>Memory Reduction:</strong> Do not decompress the encoded data when not required, try to do as many calculations directly
+on the compressed representation.</p></li>
+<li><p><strong>Performance:</strong> It should be quick, for large data ideally faster than working on the uncompressed data. Use
+<a class="reference external" href="https://numba.pydata.org/">Numba</a> to speed up code.</p></li>
+</ol>
+</div>
+<div class="section" id="implementation">
+<h2><a class="toc-backref" href="#id4">Implementation</a><a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>Imagine the following data array:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Index</p></th>
+<th class="head"><p>Data</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>“a”</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>“a”</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>“a”</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>“x”</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>“c”</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>“c”</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>“a”</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>“a”</p></td>
+</tr>
+</tbody>
+</table>
+<p>There some data points valid for multiple entries in a row:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Index</p></th>
+<th class="head"><p>Data</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td rowspan="3"><p>“a”</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>“x”</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td rowspan="2"><p>“c”</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td rowspan="2"><p>“a”</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+</tr>
+</tbody>
+</table>
+<p>These sections are also called <em>runs</em> and can be encoded by their value and their length:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 53%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Length</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>“a”</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>“x”</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>“c”</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>“a”</p></td>
+</tr>
+</tbody>
+</table>
+<p>This representation is called <a class="reference external" href="https://en.wikipedia.org/wiki/Run-length_encoding">Run-length Encoding</a>. To integrate this encoding better with <a class="reference external" href="https://pandas.pydata.org/">Pandas</a> and <a class="reference external" href="https://numpy.org/">NumPy</a> and
+to support operations like slicing and random access (e.g. via <a class="reference external" href="#" title=""><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.api.extensions.ExtensionArray.take()</span></code></a>), we
+store the end position (the cum-sum of the length column) instead of the length:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>End-position</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>“a”</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>“x”</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>“c”</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>“a”</p></td>
+</tr>
+</tbody>
+</table>
+<p>The value array is an <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> with the same dtype as the original data and the end-positions are an
+<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> with the dtype <code class="docutils literal notranslate"><span class="pre">int64</span></code>.</p>
+</div>
+<div class="section" id="license">
+<h2><a class="toc-backref" href="#id5">License</a><a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>Licensed under:</p>
+<ul class="simple">
+<li><p>MIT License (<code class="docutils literal notranslate"><span class="pre">LICENSE.txt</span></code> or <a class="reference external" href="https://opensource.org/licenses/MIT">https://opensource.org/licenses/MIT</a>)</p></li>
+</ul>
+</div>
+<div class="section" id="contents">
+<h2><a class="toc-backref" href="#id6">Contents</a><a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_rst/modules.html">Module Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_rst/rle_array.html">rle_array package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_rst/rle_array.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_rst/rle_array.array.html">rle_array.array module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_rst/rle_array.dtype.html">rle_array.dtype module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_rst/rle_array.testing.html">rle_array.testing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_rst/rle_array.types.html">rle_array.types module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_rst/rle_array.html#module-rle_array">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changes.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changes.html#version-0-1-0-unreleased">Version 0.1.0 (unreleased)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h2><a class="toc-backref" href="#id7">Indices and tables</a><a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">rle-array</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_rst/modules.html">Module Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changes.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="_rst/modules.html" title="next chapter">rle_array</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JDA Software, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

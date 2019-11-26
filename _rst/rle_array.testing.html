@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>rle_array.testing module &#8212; rle-array  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rle_array.types module" href="rle_array.types.html" />
+    <link rel="prev" title="rle_array.dtype module" href="rle_array.dtype.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-rle_array.testing">
+<span id="rle-array-testing-module"></span><h1>rle_array.testing module<a class="headerlink" href="#module-rle_array.testing" title="Permalink to this headline">¶</a></h1>
+<p>Functionality useful for testing and documentation.</p>
+<dl class="function">
+<dt id="rle_array.testing.const_col">
+<code class="sig-name descname">const_col</code><span class="sig-paren">(</span><em class="sig-param">dims: Iterable[int]</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#rle_array.testing.const_col" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of an constant columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dims</strong> – Dimensions, that describe the column content.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>name</strong> – Column name.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="#" title="">str</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rle_array.testing</span> <span class="k">import</span> <span class="n">const_col</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">const_col</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="go">&#39;const_1_2&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">const_col</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="go">&#39;const_1_2&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="rle_array.testing.dim_col">
+<code class="sig-name descname">dim_col</code><span class="sig-paren">(</span><em class="sig-param">d: int</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#rle_array.testing.dim_col" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of an dimension columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> – Dimension number.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>name</strong> – Dimension name.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="#" title="">str</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rle_array.testing</span> <span class="k">import</span> <span class="n">dim_col</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dim_col</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;dim_1&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="rle_array.testing.generate_example">
+<code class="sig-name descname">generate_example</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#rle_array.testing.generate_example" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate example DataFrame for documentation purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>df</strong> – Example DataFrame.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="#" title="">pd.DataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="rle_array.testing.generate_test_dataframe">
+<code class="sig-name descname">generate_test_dataframe</code><span class="sig-paren">(</span><em class="sig-param">n_dims: int</em>, <em class="sig-param">size: int</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#rle_array.testing.generate_test_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates testing data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_dims</strong> – Number of dimensions of test cube.</p></li>
+<li><p><strong>size</strong> – Size of every dimension (edge length).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>df</strong> – Test DataFrame.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="#" title="">pd.DataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">rle-array</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Module Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="rle_array.html">rle_array package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="rle_array.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="rle_array.array.html">rle_array.array module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rle_array.dtype.html">rle_array.dtype module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">rle_array.testing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rle_array.types.html">rle_array.types module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rle_array.html#module-rle_array">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">rle_array</a><ul>
+  <li><a href="rle_array.html">rle_array package</a><ul>
+      <li>Previous: <a href="rle_array.dtype.html" title="previous chapter">rle_array.dtype module</a></li>
+      <li>Next: <a href="rle_array.types.html" title="next chapter">rle_array.types module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JDA Software, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/_rst/rle_array.testing.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

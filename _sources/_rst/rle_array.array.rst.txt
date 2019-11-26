@@ -1,0 +1,7 @@
+rle\_array.array module
+=======================
+
+.. automodule:: rle_array.array
+   :members:
+   :undoc-members:
+   :show-inheritance:

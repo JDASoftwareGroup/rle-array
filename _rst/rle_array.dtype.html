@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>rle_array.dtype module &#8212; rle-array  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rle_array.testing module" href="rle_array.testing.html" />
+    <link rel="prev" title="rle_array.array module" href="rle_array.array.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-rle_array.dtype">
+<span id="rle-array-dtype-module"></span><h1>rle_array.dtype module<a class="headerlink" href="#module-rle_array.dtype" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="rle_array.dtype.RLEDtype">
+<em class="property">class </em><code class="sig-name descname">RLEDtype</code><span class="sig-paren">(</span><em class="sig-param">dtype: Any</em><span class="sig-paren">)</span><a class="headerlink" href="#rle_array.dtype.RLEDtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.core.dtypes.base.ExtensionDtype</span></code></a></p>
+<dl class="method">
+<dt id="rle_array.dtype.RLEDtype.construct_array_type">
+<em class="property">classmethod </em><code class="sig-name descname">construct_array_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Callable[[numpy.ndarray, numpy.ndarray], rle_array.array.RLEArray]<a class="headerlink" href="#rle_array.dtype.RLEDtype.construct_array_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the array type associated with this dtype</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="#" title="">type</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="rle_array.dtype.RLEDtype.construct_from_string">
+<em class="property">classmethod </em><code class="sig-name descname">construct_from_string</code><span class="sig-paren">(</span><em class="sig-param">string: str</em><span class="sig-paren">)</span> &#x2192; rle_array.dtype.RLEDtype<a class="headerlink" href="#rle_array.dtype.RLEDtype.construct_from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct this type from a string.</p>
+<p>This is useful mainly for data types that accept parameters.
+For example, a period dtype accepts a frequency parameter that
+can be set as <code class="docutils literal notranslate"><span class="pre">period[H]</span></code> (where H means hourly frequency).</p>
+<p>By default, in the abstract class, just the name of the type is
+expected. But subclasses can overwrite this method to accept
+parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> (<a class="reference external" href="#" title=""><em>str</em></a>) – The name of the type, for example <code class="docutils literal notranslate"><span class="pre">category</span></code>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Instance of the dtype.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="#" title="">ExtensionDtype</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="#" title=""><strong>TypeError</strong></a> – If a class cannot be constructed from this ‘string’.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>For extension dtypes with arguments the following may be an
+adequate implementation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@classmethod</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">construct_from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^my_type\[(?P&lt;arg_name&gt;.+)\]$&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">match</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">match</span><span class="o">.</span><span class="n">groupdict</span><span class="p">())</span>
+<span class="gp">... </span>    <span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot construct a &#39;</span><span class="si">{}</span><span class="s2">&#39; from &quot;</span>
+<span class="gp">... </span>                        <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">string</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rle_array.dtype.RLEDtype.kind">
+<em class="property">property </em><code class="sig-name descname">kind</code><a class="headerlink" href="#rle_array.dtype.RLEDtype.kind" title="Permalink to this definition">¶</a></dt>
+<dd><p>A character code (one of ‘biufcmMOSUV’), default ‘O’</p>
+<p>This should match the NumPy dtype used when the array is
+converted to an ndarray, which is probably ‘O’ for object if
+the extension type cannot be represented as a built-in NumPy
+type.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="#" title=""><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.dtype.kind</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rle_array.dtype.RLEDtype.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#rle_array.dtype.RLEDtype.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string identifying the data type.</p>
+<p>Will be used for display in, e.g. <code class="docutils literal notranslate"><span class="pre">Series.dtype</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rle_array.dtype.RLEDtype.type">
+<em class="property">property </em><code class="sig-name descname">type</code><a class="headerlink" href="#rle_array.dtype.RLEDtype.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The scalar type for the array, e.g. <code class="docutils literal notranslate"><span class="pre">int</span></code></p>
+<p>It’s expected <code class="docutils literal notranslate"><span class="pre">ExtensionArray[item]</span></code> returns an instance
+of <code class="docutils literal notranslate"><span class="pre">ExtensionDtype.type</span></code> for scalar <code class="docutils literal notranslate"><span class="pre">item</span></code>, assuming
+that value is valid (not NA). NA values do not need to be
+instances of <cite>type</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">rle-array</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Module Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="rle_array.html">rle_array package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="rle_array.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="rle_array.array.html">rle_array.array module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">rle_array.dtype module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rle_array.testing.html">rle_array.testing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rle_array.types.html">rle_array.types module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rle_array.html#module-rle_array">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">rle_array</a><ul>
+  <li><a href="rle_array.html">rle_array package</a><ul>
+      <li>Previous: <a href="rle_array.array.html" title="previous chapter">rle_array.array module</a></li>
+      <li>Next: <a href="rle_array.testing.html" title="next chapter">rle_array.testing module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, JDA Software, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/_rst/rle_array.dtype.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

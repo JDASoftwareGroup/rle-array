@@ -1,0 +1,20 @@
+rle\_array package
+==================
+
+Submodules
+----------
+
+.. toctree::
+
+   rle_array.array
+   rle_array.dtype
+   rle_array.testing
+   rle_array.types
+
+Module contents
+---------------
+
+.. automodule:: rle_array
+   :members:
+   :undoc-members:
+   :show-inheritance:
