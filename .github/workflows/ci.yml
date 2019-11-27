@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        python: ["3.6", "3.7"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup
+        run: |
+          ./scripts/bootstrap_conda.sh
+          source "$HOME/miniconda/etc/profile.d/conda.sh"
+          hash -r
+          conda create --yes --name=rle_array python=${{ matrix.python }} shellcheck --file=requirements.txt --file=test-requirements.txt
+          conda clean --all --yes
+          conda activate rle_array
+          asv --config ./asv_bench/asv.conf.json machine --machine travis --os unknown --arch unknown --cpu unknown --ram unknown
+          pip install -e .[testing]
+      - name: Test
+        run: |
+          source "$HOME/miniconda/etc/profile.d/conda.sh"
+          hash -r
+          conda activate rle_array
+          ./scripts/test.sh
+          touch ./docs/_build/html/.nojekyll
+      - name: Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          name: pytest-${{ runner.OS }}-${{ matrix.python }}
+      - name: Publish to PyPI
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') && matrix.python == '3.7'
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_PASSWORD }}
+      - name: Deploy Docs
+        if: github.event_name == 'push' && github.event.ref == 'refs/heads/master' && matrix.python == '3.7'
+        uses: peaceiris/actions-gh-pages@v2.5.0
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: ./docs/_build/html

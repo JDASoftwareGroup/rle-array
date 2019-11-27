@@ -1,0 +1,11 @@
+*.asv/
+*.egg-info/
+.coverage
+.pytest_cache/
+.venv/
+__pycache__/
+build/
+coverage.xml
+dist/
+docs/_build/
+docs/_rst/
