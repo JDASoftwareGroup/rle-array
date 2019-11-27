@@ -285,14 +285,14 @@ that causes realignment, with a <cite>fill_value</cite>.</p>
 <p>Here’s an example implementation, which relies on casting the
 extension array to object dtype. This uses the helper method
 <a class="reference external" href="#" title=""><code class="xref py py-func docutils literal notranslate"><span class="pre">pandas.api.extensions.take()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">take</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">allow_fill</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">take</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">allow_fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">pandas.core.algorithms</span> <span class="kn">import</span> <span class="n">take</span>
 
     <span class="c1"># If the ExtensionArray is backed by an ndarray, then</span>
     <span class="c1"># just pass that here instead of coercing to object.</span>
     <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">allow_fill</span> <span class="ow">and</span> <span class="n">fill_value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">allow_fill</span> <span class="ow">and</span> <span class="n">fill_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fill_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">na_value</span>
 
     <span class="c1"># fill value should always be translated from the scalar</span>
