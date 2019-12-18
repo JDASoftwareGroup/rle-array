@@ -13,8 +13,11 @@ class Base:
     sample_time = 1.0
     warmup_time = 1.0
 
+    def gen_baseline(self):
+        return generate_test_dataframe(n_dims=3, size=100)
+
     def setup(self):
-        self.df_baseline = generate_test_dataframe(n_dims=3, size=100)
+        self.df_baseline = self.gen_baseline()
         self.df_rle = self.df_baseline.astype("RLEDtype[int64]")
 
     @contextmanager
@@ -105,3 +108,8 @@ class TimeOperator(Base):
 
     def time_eq_const12_rle(self):
         self.df_rle[const_col([1, 2])] == self.df_rle[const_col([1, 2])]
+
+
+class TimeGenerateTestDataFrame(Base):
+    def time_generate_test_dataframe(self):
+        self.gen_baseline()

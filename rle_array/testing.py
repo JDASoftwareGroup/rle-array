@@ -59,12 +59,11 @@ def const_col(dims: Iterable[int]) -> str:
 
 
 def _setup_dim_df(n_dims: int, size: int) -> pd.DataFrame:
-    # loosly inspired by https://stackoverflow.com/a/35608701
-    elements = np.arange(size)
-    mesh = np.array(np.meshgrid(*([elements] * n_dims), indexing="ij")).T.reshape(
-        -1, n_dims
-    )
-    return pd.DataFrame(mesh, columns=[dim_col(i) for i in range(n_dims)])
+    elements = np.arange(size ** n_dims)
+    df = pd.DataFrame(index=elements)
+    for i in range(n_dims):
+        df[dim_col(i)] = (elements // (size ** i)) % size
+    return df
 
 
 def _add_const_cols(df: pd.DataFrame, n_dims: int, size: int) -> pd.DataFrame:
