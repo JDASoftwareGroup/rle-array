@@ -95,6 +95,9 @@ class TestGenerateTestDataFrame:
     def test_const_nunique(self, df, dims):
         assert df[const_col(dims)].nunique() == SIZE ** len(dims)
 
+    def test_cols_sorted(self, df):
+        assert list(df.columns) == sorted(df.columns)
+
 
 def test_generate_example():
     df = generate_example()

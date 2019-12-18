@@ -58,11 +58,20 @@ def const_col(dims: Iterable[int]) -> str:
     return f"const_{'_'.join(dims_str)}"
 
 
+def _insert_sorted(df: pd.DataFrame, column: str, value: np.ndarray) -> None:
+    pos = 0
+    for i, c in enumerate(df.columns):
+        if c > column:
+            break
+        pos = i + 1
+    df.insert(pos, column, value)
+
+
 def _setup_dim_df(n_dims: int, size: int) -> pd.DataFrame:
     elements = np.arange(size ** n_dims)
     df = pd.DataFrame(index=elements)
     for i in range(n_dims):
-        df[dim_col(i)] = (elements // (size ** i)) % size
+        _insert_sorted(df, dim_col(i), (elements // (size ** i)) % size)
     return df
 
 
@@ -76,7 +85,7 @@ def _add_const_cols(df: pd.DataFrame, n_dims: int, size: int) -> pd.DataFrame:
                 data = df[dim_col(d)].values
             else:
                 data = data * size + df[dim_col(d)].values
-        df[const_col(dims)] = data
+        _insert_sorted(df, const_col(dims), data)
     return df
 
 
@@ -98,7 +107,6 @@ def generate_test_dataframe(n_dims: int, size: int) -> pd.DataFrame:
     """
     df = _setup_dim_df(n_dims, size)
     df = _add_const_cols(df, n_dims, size)
-    df = df.sort_index(axis=1)
     return df
 
 
