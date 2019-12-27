@@ -69,7 +69,7 @@ def _insert_sorted(df: pd.DataFrame, column: str, value: np.ndarray) -> None:
 
 def _setup_dim_df(n_dims: int, size: int) -> pd.DataFrame:
     elements = np.arange(size ** n_dims)
-    df = pd.DataFrame(index=elements)
+    df = pd.DataFrame(index=pd.RangeIndex(0, len(elements)))
     for i in range(n_dims):
         _insert_sorted(df, dim_col(i), (elements // (size ** i)) % size)
     return df

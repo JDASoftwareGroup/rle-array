@@ -1,5 +1,7 @@
 import itertools
 
+import pandas as pd
+import pandas.testing as pdt
 import pytest
 
 from rle_array.testing import (
@@ -88,6 +90,10 @@ class TestGenerateTestDataFrame:
 
     def test_len(self, df):
         assert len(df) == SIZE ** N_DIMS
+
+    def test_index(self, df):
+        pdt.assert_index_equal(df.index, pd.RangeIndex(0, len(df)))
+        assert isinstance(df.index, pd.RangeIndex)
 
     def test_dim_nunique(self, df, d):
         assert df[dim_col(d)].nunique() == SIZE
