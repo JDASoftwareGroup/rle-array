@@ -35,6 +35,17 @@ _logger = logging.getLogger(__name__)
 
 
 class RLEArray(ExtensionArray):
+    """
+    Run-length encoded array.
+
+    Parameters
+    ----------
+    data
+        Data for each run.
+    positions
+        End-positions for each run.
+    """
+
     _HANDLED_TYPES = tuple(
         t for types in np.sctypes.values() for t in types if t is not object
     ) + (np.ndarray, list, tuple, int, float, complex)
