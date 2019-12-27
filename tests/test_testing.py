@@ -60,7 +60,7 @@ def test_dim_col(d, expected):
     assert actual == expected
 
 
-SIZE = 2
+SIZE = 4
 N_DIMS = 3
 
 
@@ -92,8 +92,20 @@ class TestGenerateTestDataFrame:
     def test_dim_nunique(self, df, d):
         assert df[dim_col(d)].nunique() == SIZE
 
+    def test_dim_value_counts(self, df, d):
+        assert (df[dim_col(d)].value_counts() == SIZE ** (N_DIMS - 1)).all()
+
+    def test_dims_sorted(self, df, d):
+        delta = df[dim_col(d)].values[1:] - df[dim_col(d)].values[:-1]
+        assert ((delta == 0) | (delta == 1) | (delta == -(SIZE - 1))).all()
+
     def test_const_nunique(self, df, dims):
         assert df[const_col(dims)].nunique() == SIZE ** len(dims)
+
+    def test_const_value_counts(self, df, dims):
+        assert (
+            df[const_col(dims)].value_counts() == SIZE ** (N_DIMS - len(dims))
+        ).all()
 
     def test_cols_sorted(self, df):
         assert list(df.columns) == sorted(df.columns)
