@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 
 from rle_array import RLEArray
-from rle_array._algorithms import compress
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
@@ -28,13 +27,13 @@ def uncompressed_series2(values):
 
 @pytest.fixture
 def rle_series(values):
-    return pd.Series(RLEArray(*compress(values)), index=np.arange(len(values)) + 1)
+    return pd.Series(RLEArray._from_sequence(values), index=np.arange(len(values)) + 1)
 
 
 @pytest.fixture
 def rle_series2(values):
     return pd.Series(
-        RLEArray(*compress(values[::-1])), index=np.arange(len(values)) + 1
+        RLEArray._from_sequence(values[::-1]), index=np.arange(len(values)) + 1
     )
 
 
@@ -50,7 +49,7 @@ def uncompressed_bool_series(bool_values):
 
 @pytest.fixture
 def rle_bool_series(bool_values):
-    return pd.Series(RLEArray(*compress(bool_values)))
+    return pd.Series(RLEArray._from_sequence(bool_values))
 
 
 @pytest.fixture(
@@ -215,7 +214,7 @@ def test_unary_bool_operator_array(
 
 
 def test_different_length_raises(values):
-    array1 = RLEArray(*compress(values))
-    array2 = RLEArray(*compress(values[:-1]))
+    array1 = RLEArray._from_sequence(values)
+    array2 = RLEArray._from_sequence(values[:-1])
     with pytest.raises(ValueError, match="arrays have different lengths"):
         array1 + array2
