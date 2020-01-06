@@ -36,8 +36,18 @@
 <span id="rle-array-array-module"></span><h1>rle_array.array module<a class="headerlink" href="#module-rle_array.array" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="rle_array.array.RLEArray">
-<em class="property">class </em><code class="sig-name descname">RLEArray</code><span class="sig-paren">(</span><em class="sig-param">data: Any</em>, <em class="sig-param">positions: Any</em><span class="sig-paren">)</span><a class="headerlink" href="#rle_array.array.RLEArray" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">RLEArray</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.ndarray</em>, <em class="sig-param">positions: numpy.ndarray</em><span class="sig-paren">)</span><a class="headerlink" href="#rle_array.array.RLEArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.core.arrays.base.ExtensionArray</span></code></a></p>
+<p>Run-length encoded array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Data for each run. Must be a one-dimensional. All Pandas-supported dtypes are supported.</p></li>
+<li><p><strong>positions</strong> – End-positions for each run. Must be one-dimensional and must have same length as <code class="docutils literal notranslate"><span class="pre">data</span></code>. dtype must be
+<code class="docutils literal notranslate"><span class="pre">POSITIONS_DTYPE</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="rle_array.array.RLEArray.all">
 <code class="sig-name descname">all</code><span class="sig-paren">(</span><em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#rle_array.array.RLEArray.all" title="Permalink to this definition">¶</a></dt>
