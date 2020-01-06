@@ -35,6 +35,18 @@ _logger = logging.getLogger(__name__)
 
 
 class RLEArray(ExtensionArray):
+    """
+    Run-length encoded array.
+
+    Parameters
+    ----------
+    data
+        Data for each run. Must be a one-dimensional. All Pandas-supported dtypes are supported.
+    positions
+        End-positions for each run. Must be one-dimensional and must have same length as ``data``. dtype must be
+        ``POSITIONS_DTYPE``.
+    """
+
     _HANDLED_TYPES = tuple(
         t for types in np.sctypes.values() for t in types if t is not object
     ) + (np.ndarray, list, tuple, int, float, complex)
@@ -42,7 +54,32 @@ class RLEArray(ExtensionArray):
     # For comparisons, so that numpy uses our implementation.
     __array_priority__ = 1000
 
-    def __init__(self, data: Any, positions: Any):
+    def __init__(self, data: np.ndarray, positions: np.ndarray):
+        if not isinstance(data, np.ndarray):
+            raise TypeError(f"data must be an ndarray but is {type(data).__name__}")
+        if not isinstance(positions, np.ndarray):
+            raise TypeError(
+                f"positions must be an ndarray but is {type(positions).__name__}"
+            )
+        if data.ndim != 1:
+            raise ValueError(
+                f"data must be an 1-dimensional ndarray but has {data.ndim} dimensions"
+            )
+        if positions.ndim != 1:
+            raise ValueError(
+                f"positions must be an 1-dimensional ndarray but has {positions.ndim} dimensions"
+            )
+        if positions.dtype != POSITIONS_DTYPE:
+            raise ValueError(
+                f"positions must have dtype {POSITIONS_DTYPE.__name__} but has {positions.dtype}"
+            )
+        if len(data) != len(positions):
+            raise ValueError(
+                f"data and positions must have same length but have {len(data)} and {len(positions)}"
+            )
+        if np.any(positions[1:] <= positions[:-1]):
+            raise ValueError("positions must be strictly sorted")
+
         _logger.debug(
             "RLEArray.__init__(data=%s(len=%r, dtype=%r), positions=%s(len=%r, dtype=%r))",
             type(data).__name__,

@@ -4,7 +4,6 @@ import pandas as pd
 import pytest
 
 from rle_array import RLEArray
-from rle_array._algorithms import compress
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
@@ -16,7 +15,7 @@ def array_orig():
 
 @pytest.fixture
 def array_rle(array_orig):
-    return RLEArray(*compress(array_orig))
+    return RLEArray._from_sequence(array_orig)
 
 
 def test_square(array_orig, array_rle):
@@ -29,7 +28,7 @@ def test_square(array_orig, array_rle):
 def test_square_out(array_orig, array_rle, out_is_rle):
     out_orig = np.array([0] * len(array_orig), dtype=array_orig.dtype)
     if out_is_rle:
-        out_rle = RLEArray(*compress(out_orig))
+        out_rle = RLEArray._from_sequence(out_orig)
     else:
         out_rle = out_orig.copy()
 
