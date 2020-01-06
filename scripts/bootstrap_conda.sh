@@ -22,6 +22,7 @@ hash -r
 conda config --add channels conda-forge
 conda config --set channel_priority strict
 conda config --set always_yes yes --set changeps1 no
+conda config --set pip_interop_enabled True
 
 # update conda itself
 conda update -q conda
