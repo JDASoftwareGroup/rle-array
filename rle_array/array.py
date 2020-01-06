@@ -41,9 +41,10 @@ class RLEArray(ExtensionArray):
     Parameters
     ----------
     data
-        Data for each run.
+        Data for each run. Must be a one-dimensional. All Pandas-supported dtypes are supported.
     positions
-        End-positions for each run.
+        End-positions for each run. Must be one-dimensional and must have same length as ``data``. dtype must be
+        ``POSITIONS_DTYPE``.
     """
 
     _HANDLED_TYPES = tuple(
