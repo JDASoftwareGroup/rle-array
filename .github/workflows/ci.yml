@@ -12,28 +12,58 @@ jobs:
   build:
     strategy:
       matrix:
-        python: ["3.6", "3.7"]
+        python: ["3.6", "3.7", "3.8"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: Setup
+      - name: Conda Bootstrap
+        uses: goanpeca/setup-miniconda@v1
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python }}
+      - name: Conda Config
         run: |
-          ./scripts/bootstrap_conda.sh
-          source "$HOME/miniconda/etc/profile.d/conda.sh"
-          hash -r
-          conda create --yes --name=rle_array python=${{ matrix.python }} shellcheck --file=requirements.txt --file=test-requirements.txt
-          conda clean --all --yes
-          conda activate rle_array
+          conda config --add channels conda-forge
+          conda config --add channels numba
+          conda config --set channel_priority strict
+          conda config --set always_yes yes
+          conda config --set changeps1 no
+          conda config --set pip_interop_enabled True
+      - name: Conda Install
+        shell: bash -l {0}
+        run: conda install --yes shellcheck --file=requirements.txt --file=test-requirements.txt
+      - name: Pip Install
+        shell: bash -l {0}
+        run: pip install --no-deps -e .[testing]
+      - name: Flake8
+        shell: bash -l {0}
+        run: flake8
+      - name: Mypy
+        shell: bash -l {0}
+        run: mypy .
+      - name: Black
+        shell: bash -l {0}
+        run: black --check .
+      - name: Isort
+        shell: bash -l {0}
+        run: isort --recursive --check-only
+      - name: Pytest
+        shell: bash -l {0}
+        run: pytest
+      - name: ASV
+        shell: bash -l {0}
+        run: |
           asv --config ./asv_bench/asv.conf.json machine --machine travis --os unknown --arch unknown --cpu unknown --ram unknown
-          pip install -e .[testing]
-      - name: Test
+          asv --config ./asv_bench/asv.conf.json run --show-stderr --environment existing --quick
+      - name: Sphinx
+        shell: bash -l {0}
         run: |
-          source "$HOME/miniconda/etc/profile.d/conda.sh"
-          hash -r
-          conda activate rle_array
-          ./scripts/test.sh
+          python setup.py build_sphinx
           touch ./docs/_build/html/.nojekyll
+      - name: Shellcheck
+        shell: bash -l {0}
+        run: shellcheck scripts/*.sh
       - name: Codecov
         uses: codecov/codecov-action@v1
         with:
