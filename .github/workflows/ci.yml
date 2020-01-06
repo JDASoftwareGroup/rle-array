@@ -25,6 +25,7 @@ jobs:
       - name: Conda Config
         run: |
           conda config --add channels conda-forge
+          conda config --add channels numba
           conda config --set channel_priority strict
           conda config --set always_yes yes
           conda config --set changeps1 no
