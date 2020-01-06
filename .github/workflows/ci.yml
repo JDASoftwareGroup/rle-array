@@ -36,21 +36,21 @@ jobs:
       - name: Pip Install
         shell: bash -l {0}
         run: pip install --no-deps -e .[testing]
-      - name: MyPy
-        shell: bash -l {0}
-        run: mypy .
-      - name: PyTest
-        shell: bash -l {0}
-        run: pytest
-      - name: Black
-        shell: bash -l {0}
-        run: black --check .
-      - name: ISort
-        shell: bash -l {0}
-        run: isort --recursive --check-only
       - name: Flake8
         shell: bash -l {0}
         run: flake8
+      - name: Mypy
+        shell: bash -l {0}
+        run: mypy .
+      - name: Black
+        shell: bash -l {0}
+        run: black --check .
+      - name: Isort
+        shell: bash -l {0}
+        run: isort --recursive --check-only
+      - name: Pytest
+        shell: bash -l {0}
+        run: pytest
       - name: ASV
         shell: bash -l {0}
         run: |
