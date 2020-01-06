@@ -79,7 +79,7 @@ parameters.</p>
 <p class="rubric">Examples</p>
 <p>For extension dtypes with arguments the following may be an
 adequate implementation.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@classmethod</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@classmethod</span>
 <span class="gp">... </span><span class="k">def</span> <span class="nf">construct_from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^my_type\[(?P&lt;arg_name&gt;.+)\]$&quot;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">match</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
@@ -201,7 +201,7 @@ instances of <cite>type</cite>.</p>
       &copy;2019, JDA Software, Inc.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
