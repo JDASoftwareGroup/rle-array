@@ -4,6 +4,7 @@ import numba
 import numpy as np
 import pandas as pd
 
+from ._slicing import NormalizedSlice
 from .types import POSITIONS_DTYPE
 
 
@@ -209,29 +210,14 @@ def find_slice(
         End positions of runs.
     """
     length = get_len(positions)
+    s_norm = NormalizedSlice.from_slice(length, s)
 
-    start = 0
-    stop = length
-    step = None
+    start, stop, step = s_norm.start, s_norm.stop, s_norm.step
     invert = False
-
-    if (s.step is not None) and (s.step != 1):
-        if s.step < 0:
-            invert = True
-            step = -s.step
-        else:
-            step = s.step
-
-    if s.start is not None:
-        if s.start < 0:
-            start = max(start, length + s.start)
-        else:
-            start = max(start, s.start)
-    if s.stop is not None:
-        if s.stop < 0:
-            stop = max(0, min(stop, length + s.stop))
-        else:
-            stop = min(stop, s.stop)
+    if s_norm.step < 0:
+        invert = True
+        start, stop = stop + 1, start + 1
+        step = abs(step)
 
     if start == 0:
         idx_start = 0
@@ -257,7 +243,7 @@ def find_slice(
         positions = np.cumsum(lenghts)
         data = data[::-1]
 
-    if step:
+    if step != 1:
         positions = ((positions - 1) // step) + 1
 
         mask = np.empty(len(positions), dtype=bool)

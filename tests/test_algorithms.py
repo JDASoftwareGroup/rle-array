@@ -755,9 +755,9 @@ def test_find_single_index_raise(data, positions, i):
             # positions_before
             np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=POSITIONS_DTYPE),
             # s
-            slice(2, 9, -3),
+            slice(9, 2, -3),
             # data_after
-            np.array([9, 6, 3], dtype=np.int8),
+            np.array([10, 7, 4], dtype=np.int8),
             # positions_after
             np.array([1, 2, 3], dtype=POSITIONS_DTYPE),
         ),
@@ -767,9 +767,9 @@ def test_find_single_index_raise(data, positions, i):
             # positions_before
             np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=POSITIONS_DTYPE),
             # s
-            slice(3, 9, -3),
+            slice(9, 3, -3),
             # data_after
-            np.array([9, 6], dtype=np.int8),
+            np.array([10, 7], dtype=np.int8),
             # positions_after
             np.array([1, 2], dtype=POSITIONS_DTYPE),
         ),
@@ -808,6 +808,30 @@ def test_find_single_index_raise(data, positions, i):
             np.array([1], dtype=np.int8),
             # positions_after
             np.array([2], dtype=POSITIONS_DTYPE),
+        ),
+        (
+            # data_before
+            np.array([1, 2, 1, 2], dtype=np.int8),
+            # positions_before
+            np.array([1, 2, 3, 4], dtype=POSITIONS_DTYPE),
+            # s
+            slice(4, 0, 1),
+            # data_after
+            np.array([], dtype=np.int8),
+            # positions_after
+            np.array([], dtype=POSITIONS_DTYPE),
+        ),
+        (
+            # data_before
+            np.array([1, 2, 1, 2], dtype=np.int8),
+            # positions_before
+            np.array([1, 2, 3, 4], dtype=POSITIONS_DTYPE),
+            # s
+            slice(0, 4, -1),
+            # data_after
+            np.array([], dtype=np.int8),
+            # positions_after
+            np.array([], dtype=POSITIONS_DTYPE),
         ),
     ],
 )
