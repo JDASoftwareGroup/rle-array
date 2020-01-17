@@ -23,6 +23,8 @@ We do not want to deal with all these edge cases in every code snipped that deal
 """
 from typing import Optional
 
+import numpy as np
+
 
 class NormalizedSlice:
     """
@@ -199,26 +201,37 @@ class NormalizedSlice:
         return steps
 
     @classmethod
-    def _check_slice(cls, s: slice) -> None:
+    def _check_and_prepare_slice(cls, s: Optional[slice]) -> slice:
         """
-        Check input slice for convertion.
+        Check and prepare input slice for convertion.
         """
+        if s is None:
+            s = slice(None, None, None)
+
         if not isinstance(s, slice):
             raise TypeError(f"slice must be a slice but is {type(s).__name__}")
-        if (s.start is not None) and not isinstance(s.start, int):
+
+        if (s.start is not None) and not isinstance(s.start, (int, np.int64)):
             raise TypeError(
                 f"slice start must be int or None but is {type(s.start).__name__}"
             )
-        if (s.stop is not None) and not isinstance(s.stop, int):
+        start = None if s.start is None else int(s.start)
+
+        if (s.stop is not None) and not isinstance(s.stop, (int, np.int64)):
             raise TypeError(
                 f"slice stop must be int or None but is {type(s.stop).__name__}"
             )
-        if (s.step is not None) and not isinstance(s.step, int):
+        stop = None if s.stop is None else int(s.stop)
+
+        if (s.step is not None) and not isinstance(s.step, (int, np.int64)):
             raise TypeError(
                 f"slice step must be int or None but is {type(s.step).__name__}"
             )
         if s.step == 0:
             raise ValueError("slice step cannot be zero")
+        step = None if s.step is None else int(s.step)
+
+        return slice(start, stop, step)
 
     @classmethod
     def from_slice(cls, container_length: int, s: Optional[slice]) -> "NormalizedSlice":
@@ -238,11 +251,9 @@ class NormalizedSlice:
                    ``None`` nor an integer.
         ValueError: Illegal ``slice`` values or ``container_length``.
         """
-        if s is None:
-            s = slice(None, None, None)
-        cls._check_slice(s)
+        s2 = cls._check_and_prepare_slice(s)
 
-        if not isinstance(container_length, int):
+        if not isinstance(container_length, (int, np.int64)):
             raise TypeError(
                 f"container_length must be an int but is {type(container_length).__name__}"
             )
@@ -252,10 +263,12 @@ class NormalizedSlice:
         if container_length == 0:
             return cls(start=0, stop=0, step=1, container_length=0)
 
+        container_length = int(container_length)
+
         default_start, default_stop = 0, container_length
 
-        if s.step is not None:
-            step = s.step
+        if s2.step is not None:
+            step = s2.step
             if step < 0:
                 default_start, default_stop = default_stop - 1, default_start - 1
         else:
@@ -266,19 +279,19 @@ class NormalizedSlice:
             b = max(default_start, default_stop)
             return max(a, min(b, x))
 
-        if s.start is not None:
-            if s.start < 0:
-                start = limit(container_length + s.start)
+        if s2.start is not None:
+            if s2.start < 0:
+                start = limit(container_length + s2.start)
             else:
-                start = limit(s.start)
+                start = limit(s2.start)
         else:
             start = default_start
 
-        if s.stop is not None:
-            if s.stop < 0:
-                stop = limit(container_length + s.stop)
+        if s2.stop is not None:
+            if s2.stop < 0:
+                stop = limit(container_length + s2.stop)
             else:
-                stop = limit(s.stop)
+                stop = limit(s2.stop)
         else:
             stop = default_stop
 

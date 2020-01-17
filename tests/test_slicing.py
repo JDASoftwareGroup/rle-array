@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from rle_array._slicing import NormalizedSlice
@@ -361,15 +362,27 @@ class TestFromSlice:
                 # expected
                 NormalizedSlice(start=0, stop=0, step=1, container_length=10),
             ),
+            (  # numpy.int64
+                # container_length
+                np.int64(100),
+                # s
+                slice(np.int64(0), np.int64(100), np.int64(1)),
+                # expected
+                NormalizedSlice(start=0, stop=100, step=1, container_length=100),
+            ),
         ],
     )
     def test_ok(self, container_length, s, expected):
         actual = NormalizedSlice.from_slice(container_length, s)
         assert type(actual) == NormalizedSlice
         assert actual.start == expected.start
+        assert type(actual.start) == int
         assert actual.stop == expected.stop
+        assert type(actual.stop) == int
         assert actual.step == expected.step
+        assert type(actual.step) == int
         assert actual.container_length == expected.container_length
+        assert type(actual.container_length) == int
 
 
 class TestProject:
