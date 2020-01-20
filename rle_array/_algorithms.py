@@ -221,10 +221,10 @@ def find_slice(
 
     if start == 0:
         idx_start = 0
-    elif start >= length:
-        idx_start = len(positions)
     else:
         idx_start = np.searchsorted(positions, start, side="right")
+    # start >= length cannot occur here because NormalizedSlice sets start=0 and stop=0 for empty slices
+
     if stop == 0:
         idx_stop = 0
     elif stop >= length:

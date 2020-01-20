@@ -499,6 +499,30 @@ def test_find_single_index_raise(data, positions, i):
         ),
         (
             # data_before
+            np.array([13, 42], dtype=np.int8),
+            # positions_before
+            np.array([3, 13], dtype=POSITIONS_DTYPE),
+            # s
+            slice(None, None),
+            # data_after
+            np.array([13, 42], dtype=np.int8),
+            # positions_after
+            np.array([3, 13], dtype=POSITIONS_DTYPE),
+        ),
+        (
+            # data_before
+            np.array([42], dtype=np.int8),
+            # positions_before
+            np.array([10], dtype=POSITIONS_DTYPE),
+            # s
+            slice(9, 10),
+            # data_after
+            np.array([42], dtype=np.int8),
+            # positions_after
+            np.array([1], dtype=POSITIONS_DTYPE),
+        ),
+        (
+            # data_before
             np.array([42], dtype=np.int8),
             # positions_before
             np.array([13], dtype=POSITIONS_DTYPE),
