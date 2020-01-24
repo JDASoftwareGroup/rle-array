@@ -214,7 +214,7 @@ def find_slice(
 
     start, stop, step = s_norm.start, s_norm.stop, s_norm.step
     invert = False
-    if s_norm.step < 0:
+    if step < 0:
         invert = True
         start, stop = stop + 1, start + 1
         step = abs(step)

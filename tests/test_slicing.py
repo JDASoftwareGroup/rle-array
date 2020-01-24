@@ -120,7 +120,10 @@ class TestConstructor:
             NormalizedSlice(start=0, stop=0, step=2, container_length=100)
 
     def test_fail_distance_not_modulo(self):
-        with pytest.raises(ValueError, match="start->stop distance is not modulo step"):
+        with pytest.raises(
+            ValueError,
+            match="The distance between start and stop most be divisible by the step size",
+        ):
             NormalizedSlice(start=0, stop=10, step=3, container_length=100)
 
 

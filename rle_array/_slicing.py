@@ -141,7 +141,9 @@ class NormalizedSlice:
                     )
 
             if abs(self.start - self.stop) % abs(self.step) != 0:
-                raise ValueError("start->stop distance is not modulo step")
+                raise ValueError(
+                    "The distance between start and stop most be divisible by the step size"
+                )
 
     @property
     def start(self) -> int:
@@ -203,7 +205,7 @@ class NormalizedSlice:
     @classmethod
     def _check_and_prepare_slice(cls, s: Optional[slice]) -> slice:
         """
-        Check and prepare input slice for convertion.
+        Check and prepare input slice for conversion.
         """
         if s is None:
             s = slice(None, None, None)
