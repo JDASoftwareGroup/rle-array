@@ -433,6 +433,14 @@ class TestProject:
                 # expected
                 NormalizedSlice(start=5, stop=23, step=9, container_length=100),
             ),
+            (  # take empty
+                # s1
+                NormalizedSlice(start=1, stop=9, step=2, container_length=100),
+                # s2
+                NormalizedSlice(start=0, stop=0, step=1, container_length=4),
+                # expected
+                NormalizedSlice(start=0, stop=0, step=1, container_length=100),
+            ),
         ],
     )
     def test_ok(self, s1, s2, expected):
