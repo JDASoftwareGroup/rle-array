@@ -1,7 +1,9 @@
 import logging
 import operator
 import warnings
+from collections import namedtuple
 from typing import Any, Callable, Iterator, Optional, Sequence, Union
+from weakref import WeakSet
 
 import numpy as np
 import pandas as pd
@@ -28,10 +30,84 @@ from ._algorithms import (
     recompress,
     take,
 )
+from ._slicing import NormalizedSlice
 from .dtype import RLEDtype
 from .types import POSITIONS_DTYPE
 
 _logger = logging.getLogger(__name__)
+
+
+class _ViewMaster:
+    """
+    Collection of all views to an array.
+
+    This tracks the original data as well as all views.
+    """
+
+    def __init__(self, data: np.ndarray, positions: np.ndarray):
+        self.data = data
+        self.positions = positions
+        self.views: WeakSet[RLEArray] = WeakSet()
+
+    @classmethod
+    def register_first(cls, array: "RLEArray") -> "_Projection":
+        """
+        Register array with new master.
+
+        The array must not have a view master yet!
+        """
+        assert getattr(array, "_projection", None) is None
+
+        projection = _Projection(
+            projection_slice=None,
+            master=cls(data=array._data, positions=array._positions),
+        )
+        projection.master.views.add(array)
+        return projection
+
+    def register_change(
+        self, array: "RLEArray", projection_slice: Optional[slice]
+    ) -> None:
+        """
+        Re-register array with new view-master.
+
+        The array must only be registered with a single, no orphan master!
+        """
+        # ensure the array is only registered with another orphan master
+        assert array._projection is not None
+        assert array._projection.projection_slice is None
+        assert array._projection.master is not self
+        assert len(array._projection.master.views) == 1
+        assert array not in self.views
+
+        array._projection = _Projection(projection_slice=projection_slice, master=self)
+        self.views.add(array)
+
+    def modify(self, data: np.ndarray, positions: np.ndarray) -> None:
+        """
+        Modify the original (unprojected) data and populate change to all views.
+        """
+        self.data = data
+        self.positions = positions
+
+        for view in self.views:
+            assert view._projection is not None
+            assert view._projection.master is self
+
+            if view._projection.projection_slice is not None:
+                data2, positions2 = find_slice(
+                    data=self.data,
+                    positions=self.positions,
+                    s=view._projection.projection_slice,
+                )
+            else:
+                data2, positions2 = self.data, self.positions
+
+            view._data = data2
+            view._positions = positions2
+
+
+_Projection = namedtuple("_Projection", ["master", "projection_slice"])
 
 
 class RLEArray(ExtensionArray):
@@ -89,9 +165,11 @@ class RLEArray(ExtensionArray):
             len(positions),
             positions.dtype,
         )
+
         self._dtype = RLEDtype(data.dtype)
         self._data = data
         self._positions = positions
+        self._projection = _ViewMaster.register_first(self)
 
     @property
     def _lengths(self) -> Any:
@@ -146,20 +224,44 @@ class RLEArray(ExtensionArray):
             return self._from_sequence(result)
         elif isinstance(arr, slice):
             data, positions = find_slice(self._data, self._positions, arr)
-            return RLEArray(data=data, positions=positions)
+            parent_normalized = NormalizedSlice.from_slice(
+                get_len(self._projection.master.positions),
+                self._projection.projection_slice,
+            )
+            child_normalized = NormalizedSlice.from_slice(len(self), arr)
+            subslice = parent_normalized.project(child_normalized).to_slice()
+            result = RLEArray(data=data, positions=positions)
+            self._projection.master.register_change(result, subslice)
+            return result
         else:
             if arr < 0:
                 arr = arr + len(self)
             return find_single_index(self._data, self._positions, arr)
 
+    def __hash__(self) -> int:
+        return id(self)
+
     def __setitem__(self, index: Any, data: Any) -> None:
         _logger.debug("RLEArray.__setitem__(...)")
-        array = np.asarray(self)
-        array[index] = data
-        self2 = self._from_sequence(scalars=array, dtype=self.dtype, copy=False)
 
-        self._positions = self2._positions
-        self._data = self2._data
+        # get master data
+        orig = decompress(
+            data=self._projection.master.data,
+            positions=self._projection.master.positions,
+        )
+
+        # get our view
+        if self._projection.projection_slice is not None:
+            sub = orig[self._projection.projection_slice]
+        else:
+            sub = orig
+
+        # modify master data through view
+        sub[index] = data
+
+        # commit to all views (including self)
+        data, positions = compress(orig)
+        self._projection.master.modify(data, positions)
 
     def __len__(self) -> int:
         _logger.debug("RLEArray.__len__()")
@@ -440,7 +542,14 @@ class RLEArray(ExtensionArray):
 
     def view(self, dtype: Any) -> Any:
         _logger.debug("RLEArray.view(dtype=%r)", dtype)
-        return np.asarray(self).view(dtype)
+        if isinstance(dtype, RLEDtype):
+            dtype = dtype._dtype
+        if dtype != self.dtype._dtype:
+            raise ValueError("Cannot create view with different dtype.")
+
+        result = RLEArray(data=self._data.copy(), positions=self._positions.copy())
+        self._projection.master.register_change(result, None)
+        return result
 
     def dropna(self) -> "RLEArray":
         _logger.debug("RLEArray.dropna()")
@@ -623,3 +732,14 @@ class RLEArray(ExtensionArray):
             a = self2[abs(periods) :]
             b = empty
         return self._concat_same_type([a, b])
+
+    def fillna(
+        self,
+        value: Any = None,
+        method: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> Any:
+        # TODO: fast-path
+        arr = pd.Series(np.asarray(self)).array.fillna(value, method, limit)
+        data, positions = compress(arr)
+        return RLEArray(data=data, positions=positions)
