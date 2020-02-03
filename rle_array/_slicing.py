@@ -362,6 +362,11 @@ class NormalizedSlice:
         stop = self.start + child.stop * self.step
         step = self.step * child.step
 
+        if start == stop:
+            return type(self)(
+                start=0, stop=0, step=1, container_length=self.container_length
+            )
+
         return type(self)(
             start=start, stop=stop, step=step, container_length=self.container_length
         )

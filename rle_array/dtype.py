@@ -48,3 +48,6 @@ class RLEDtype(ExtensionDtype):
     @property
     def _is_boolean(self) -> bool:
         return self.kind == "b"
+
+    def __repr__(self) -> str:
+        return f"RLEDtype({self._dtype!r})"
