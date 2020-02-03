@@ -115,6 +115,36 @@ new dtype.</p></li>
 </dd></dl>
 
 <dl class="method">
+<dt id="rle_array.array.RLEArray.fillna">
+<code class="sig-name descname">fillna</code><span class="sig-paren">(</span><em class="sig-param">value: Any = None</em>, <em class="sig-param">method: Optional[str] = None</em>, <em class="sig-param">limit: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.fillna" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill NA/NaN values using the specified method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<a class="reference external" href="#" title=""><em>scalar</em></a><em>, </em><a class="reference external" href="#" title=""><em>array-like</em></a>) – If a scalar value is passed it is used to fill all missing values.
+Alternatively, an array-like ‘value’ can be given. It’s expected
+that the array-like have the same length as ‘self’.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="#" title=""><em>{'backfill'</em></a><em>, </em><a class="reference external" href="#" title=""><em>'bfill'</em></a><em>, </em><a class="reference external" href="#" title=""><em>'pad'</em></a><em>, </em><a class="reference external" href="#" title=""><em>'ffill'</em></a><em>, </em><a class="reference external" href="#" title=""><em>None}</em></a><em>, </em><a class="reference external" href="#" title=""><em>default None</em></a>) – Method to use for filling holes in reindexed Series
+pad / ffill: propagate last valid observation forward to next valid
+backfill / bfill: use NEXT valid observation to fill gap</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="#" title=""><em>int</em></a><em>, </em><a class="reference external" href="#" title=""><em>default None</em></a>) – If method is specified, this is the maximum number of consecutive
+NaN values to forward/backward fill. In other words, if there is
+a gap with more than this number of consecutive NaNs, it will only
+be partially filled. If method is not specified, this is the
+maximum number of entries along the entire axis where NaNs will be
+filled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>filled</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="#" title="">ExtensionArray with NA/NaN filled</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="rle_array.array.RLEArray.isna">
 <code class="sig-name descname">isna</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; rle_array.array.RLEArray<a class="headerlink" href="#rle_array.array.RLEArray.isna" title="Permalink to this definition">¶</a></dt>
 <dd><p>A 1-D array indicating if each value is missing.</p>
