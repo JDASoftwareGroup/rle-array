@@ -36,7 +36,7 @@ class RLEDtype(ExtensionDtype):
 
     @classmethod
     def construct_array_type(
-        cls
+        cls,
     ) -> Callable[[np.ndarray, np.ndarray], "rle_array.RLEArray"]:
         return rle_array.RLEArray
 
