@@ -27,6 +27,9 @@ class RLEDtype(ExtensionDtype):
 
     @classmethod
     def construct_from_string(cls, string: str) -> "RLEDtype":
+        """
+        Strict construction from a string, raise a TypeError if not possible.
+        """
         prefix = "RLEDtype["
         suffix = "]"
         if not (string.startswith(prefix) and string.endswith(suffix)):
