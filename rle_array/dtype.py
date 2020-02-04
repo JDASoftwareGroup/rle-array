@@ -30,7 +30,7 @@ class RLEDtype(ExtensionDtype):
         prefix = "RLEDtype["
         suffix = "]"
         if not (string.startswith(prefix) and string.endswith(suffix)):
-            raise TypeError(string)
+            raise TypeError(f"Cannot construct a '{cls.__name__}' from '{string}'")
         sub = string[len(prefix) : -len(suffix)]
         return cls(np.dtype(sub))
 
