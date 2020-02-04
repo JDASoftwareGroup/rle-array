@@ -540,8 +540,10 @@ class RLEArray(ExtensionArray):
         else:
             raise NotImplementedError(f"reduction {name} is not implemented.")
 
-    def view(self, dtype: Any) -> Any:
+    def view(self, dtype: Optional[Any] = None) -> Any:
         _logger.debug("RLEArray.view(dtype=%r)", dtype)
+        if dtype is None:
+            dtype = self.dtype._dtype
         if isinstance(dtype, RLEDtype):
             dtype = dtype._dtype
         if dtype != self.dtype._dtype:

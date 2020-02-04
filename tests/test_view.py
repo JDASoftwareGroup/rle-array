@@ -13,16 +13,22 @@ def test_view_raises_differnt_dtype():
         orig.view(np.int8)
 
 
-@pytest.mark.parametrize("use_numpy_dtype", [False, True])
-def test_plain_view(use_numpy_dtype):
+@pytest.mark.parametrize("dtype", ["none", "numpy", "rle"])
+def test_plain_view(dtype):
     orig = RLEArray._from_sequence(np.arange(10))
 
-    dtype = orig.dtype
-    if use_numpy_dtype:
-        dtype = dtype._dtype
+    if dtype == "none":
+        dtype = None
+    elif dtype == "numpy":
+        dtype = orig.dtype._dtype
+    elif dtype == "rle":
+        dtype = orig.dtype
+    else:
+        raise ValueError(f"unknown dtype variante {dtype}")
     view = orig.view(dtype)
 
     assert view is not orig
+    assert view.dtype == orig.dtype
     npt.assert_array_equal(orig, view)
 
     orig[[0, 1]] = [100, 101]
@@ -39,9 +45,9 @@ def test_view_tree():
     #       +->12
     orig = RLEArray._from_sequence(np.arange(10))
 
-    view1 = orig.view(orig.dtype)
-    view11 = view1.view(view1.dtype)
-    view12 = view1.view(view1.dtype)
+    view1 = orig.view()
+    view11 = view1.view()
+    view12 = view1.view()
 
     assert view1 is not orig
     assert view11 is not orig
