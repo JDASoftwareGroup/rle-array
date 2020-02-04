@@ -8,6 +8,7 @@ from weakref import WeakSet
 import numpy as np
 import pandas as pd
 from pandas.api.extensions import ExtensionArray
+from pandas.arrays import BooleanArray, IntegerArray
 from pandas.core import ops
 from pandas.core.dtypes.common import is_array_like
 from pandas.core.dtypes.generic import ABCIndexClass, ABCSeries
@@ -211,9 +212,38 @@ class RLEArray(ExtensionArray):
             warnings.warn(
                 "performance: __getitem__ with list is slow", PerformanceWarning
             )
-            arr = np.asarray(arr)
+            if isinstance(arr, BooleanArray):
+                try:
+                    arr = np.asarray(arr, dtype=bool)
+                except ValueError:
+                    raise ValueError(
+                        "Cannot mask with a boolean indexer containing NA values"
+                    )
+            elif isinstance(arr, IntegerArray):
+                try:
+                    arr = np.asarray(arr, dtype=int)
+                except ValueError:
+                    raise ValueError(
+                        "Cannot index with an integer indexer containing NA values"
+                    )
+            elif isinstance(arr, RLEArray):
+                arr = np.asarray(arr, dtype=arr.dtype._dtype)
+            elif isinstance(arr, list):
+                if any((pd.isna(x) for x in arr)):
+                    raise ValueError(
+                        "Cannot index with an integer indexer containing NA values"
+                    )
+                arr = np.asarray(arr)
+            else:
+                arr = np.asarray(arr)
+
             if arr.dtype == np.bool_:
+                if len(arr) != len(self):
+                    raise IndexError("boolean mask does not have correct length")
                 arr = np.arange(len(self))[arr]
+            else:
+                arr = arr.astype(int)
+
             arr[arr < 0] += len(self)
 
             result = np.asarray(
@@ -540,8 +570,10 @@ class RLEArray(ExtensionArray):
         else:
             raise NotImplementedError(f"reduction {name} is not implemented.")
 
-    def view(self, dtype: Any) -> Any:
+    def view(self, dtype: Optional[Any] = None) -> Any:
         _logger.debug("RLEArray.view(dtype=%r)", dtype)
+        if dtype is None:
+            dtype = self.dtype._dtype
         if isinstance(dtype, RLEDtype):
             dtype = dtype._dtype
         if dtype != self.dtype._dtype:

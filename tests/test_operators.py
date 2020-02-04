@@ -5,7 +5,7 @@ import numpy.testing as npt
 import pandas as pd
 import pytest
 
-from rle_array import RLEArray
+from rle_array import RLEArray, RLEDtype
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
@@ -119,6 +119,8 @@ def binary_bool_operator(request):
 
 def test_compare_scalar(rle_series, uncompressed_series, compare_operator):
     actual = compare_operator(rle_series, 2.0)
+    assert actual.dtype == RLEDtype(bool)
+
     expected = compare_operator(uncompressed_series, 2.0).astype("RLEDtype[bool]")
     pd.testing.assert_series_equal(actual, expected)
 
@@ -127,6 +129,8 @@ def test_compare_rle_series(
     rle_series, rle_series2, uncompressed_series, uncompressed_series2, compare_operator
 ):
     actual = compare_operator(rle_series, rle_series2)
+    assert actual.dtype == RLEDtype(bool)
+
     expected = compare_operator(uncompressed_series, uncompressed_series2).astype(
         "RLEDtype[bool]"
     )
@@ -135,28 +139,38 @@ def test_compare_rle_series(
 
 def test_compare_uncompressed_series(rle_series, uncompressed_series, compare_operator):
     actual = compare_operator(rle_series, uncompressed_series)
+    assert actual.dtype == bool
+
     expected = compare_operator(uncompressed_series, uncompressed_series)
     pd.testing.assert_series_equal(actual, expected)
 
 
 def test_binary_operator_scalar(rle_series, uncompressed_series, binary_operator):
     actual = binary_operator(rle_series, 2)
-    expected = binary_operator(uncompressed_series, 2)
-    pd.testing.assert_series_equal(actual, expected, check_dtype=False)
+    assert actual.dtype == RLEDtype(float)
+
+    expected = binary_operator(uncompressed_series, 2).astype("RLEDtype[float]")
+    pd.testing.assert_series_equal(actual, expected)
 
 
 def test_binary_operator_rle_series(
     rle_series, rle_series2, uncompressed_series, uncompressed_series2, binary_operator
 ):
     actual = binary_operator(rle_series, rle_series2)
-    expected = binary_operator(uncompressed_series, uncompressed_series2)
-    pd.testing.assert_series_equal(actual, expected, check_dtype=False)
+    assert actual.dtype == RLEDtype(float)
+
+    expected = binary_operator(uncompressed_series, uncompressed_series2).astype(
+        "RLEDtype[float]"
+    )
+    pd.testing.assert_series_equal(actual, expected)
 
 
 def test_binary_operator_uncompressed_series(
     rle_series, uncompressed_series, binary_operator
 ):
     actual = binary_operator(rle_series, uncompressed_series)
+    assert actual.dtype == float
+
     expected = binary_operator(uncompressed_series, uncompressed_series)
     pd.testing.assert_series_equal(actual, expected)
 
@@ -165,7 +179,11 @@ def test_binary_bool_operator_scalar(
     rle_bool_series, uncompressed_bool_series, binary_bool_operator
 ):
     actual = binary_bool_operator(rle_bool_series, True)
-    expected = binary_bool_operator(uncompressed_bool_series, True)
+    assert actual.dtype == RLEDtype(bool)
+
+    expected = binary_bool_operator(uncompressed_bool_series, True).astype(
+        RLEDtype(bool)
+    )
     pd.testing.assert_series_equal(actual, expected)
 
 
@@ -173,7 +191,11 @@ def test_binary_bool_operator_rle_series(
     rle_bool_series, uncompressed_bool_series, binary_bool_operator
 ):
     actual = binary_bool_operator(rle_bool_series, rle_bool_series)
-    expected = binary_bool_operator(uncompressed_bool_series, uncompressed_bool_series)
+    assert actual.dtype == RLEDtype(bool)
+
+    expected = binary_bool_operator(
+        uncompressed_bool_series, uncompressed_bool_series
+    ).astype(RLEDtype(bool))
     pd.testing.assert_series_equal(actual, expected)
 
 
@@ -181,18 +203,30 @@ def test_binary_bool_operator_uncompressed_series(
     rle_bool_series, uncompressed_bool_series, binary_bool_operator
 ):
     actual = binary_bool_operator(rle_bool_series, uncompressed_bool_series)
+    assert actual.dtype == bool
+
     expected = binary_bool_operator(uncompressed_bool_series, uncompressed_bool_series)
     pd.testing.assert_series_equal(actual, expected)
 
 
 def test_unary_operator(rle_series, uncompressed_series, unary_operator):
+    if unary_operator in (operator.neg, operator.pos):
+        # series implementation seems to cast the rle-array to numpy
+        dtype = float
+    else:
+        dtype = RLEDtype(float)
+
     actual = unary_operator(rle_series)
-    expected = unary_operator(uncompressed_series)
-    pd.testing.assert_series_equal(actual, expected, check_dtype=False)
+    assert actual.dtype == dtype
+
+    expected = unary_operator(uncompressed_series).astype(dtype)
+    pd.testing.assert_series_equal(actual, expected)
 
 
 def test_unary_operator_array(rle_series, uncompressed_series, unary_operator):
     actual = unary_operator(rle_series.array)
+    assert actual.dtype == RLEDtype(float)
+
     expected = unary_operator(uncompressed_series.array)
     npt.assert_array_equal(actual, expected)
 
@@ -200,15 +234,25 @@ def test_unary_operator_array(rle_series, uncompressed_series, unary_operator):
 def test_unary_bool_operator(
     rle_bool_series, uncompressed_bool_series, unary_bool_operator
 ):
+    if unary_bool_operator in (operator.inv,):
+        # series implementation seems to cast the rle-array to numpy
+        dtype = bool
+    else:
+        dtype = RLEDtype(bool)
+
     actual = unary_bool_operator(rle_bool_series)
-    expected = unary_bool_operator(uncompressed_bool_series)
-    pd.testing.assert_series_equal(actual, expected, check_dtype=False)
+    assert actual.dtype == dtype
+
+    expected = unary_bool_operator(uncompressed_bool_series).astype(dtype)
+    pd.testing.assert_series_equal(actual, expected)
 
 
 def test_unary_bool_operator_array(
     rle_bool_series, uncompressed_bool_series, unary_bool_operator
 ):
     actual = unary_bool_operator(rle_bool_series.array)
+    assert actual.dtype == RLEDtype(bool)
+
     expected = unary_bool_operator(uncompressed_bool_series.array)
     npt.assert_array_equal(actual, expected)
 
