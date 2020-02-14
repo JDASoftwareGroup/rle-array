@@ -38,6 +38,41 @@ from .types import POSITIONS_DTYPE
 _logger = logging.getLogger(__name__)
 
 
+def _normalize_arraylike_indexing(arr: Any) -> np.ndarray:
+    """
+    Normalize arralike index arguments for ``__getitem__`` and ``__setitem__``.
+
+    This is required since pandas can pass us many different types with potentially nullable data.
+
+    Parameters
+    ----------
+    arr
+        Index argument passed to ``__getitem__`` and ``__setitem__`` if arraylike.
+    """
+    if isinstance(arr, BooleanArray):
+        try:
+            return np.asarray(arr, dtype=bool)
+        except ValueError:
+            raise ValueError("Cannot mask with a boolean indexer containing NA values")
+    elif isinstance(arr, IntegerArray):
+        try:
+            return np.asarray(arr, dtype=int)
+        except ValueError:
+            raise ValueError(
+                "Cannot index with an integer indexer containing NA values"
+            )
+    elif isinstance(arr, RLEArray):
+        return np.asarray(arr, dtype=arr.dtype._dtype)
+    elif isinstance(arr, list):
+        if any((pd.isna(x) for x in arr)):
+            raise ValueError(
+                "Cannot index with an integer indexer containing NA values"
+            )
+        return np.asarray(arr)
+    else:
+        return np.asarray(arr)
+
+
 class _ViewMaster:
     """
     Collection of all views to an array.
@@ -212,30 +247,7 @@ class RLEArray(ExtensionArray):
             warnings.warn(
                 "performance: __getitem__ with list is slow", PerformanceWarning
             )
-            if isinstance(arr, BooleanArray):
-                try:
-                    arr = np.asarray(arr, dtype=bool)
-                except ValueError:
-                    raise ValueError(
-                        "Cannot mask with a boolean indexer containing NA values"
-                    )
-            elif isinstance(arr, IntegerArray):
-                try:
-                    arr = np.asarray(arr, dtype=int)
-                except ValueError:
-                    raise ValueError(
-                        "Cannot index with an integer indexer containing NA values"
-                    )
-            elif isinstance(arr, RLEArray):
-                arr = np.asarray(arr, dtype=arr.dtype._dtype)
-            elif isinstance(arr, list):
-                if any((pd.isna(x) for x in arr)):
-                    raise ValueError(
-                        "Cannot index with an integer indexer containing NA values"
-                    )
-                arr = np.asarray(arr)
-            else:
-                arr = np.asarray(arr)
+            arr = _normalize_arraylike_indexing(arr)
 
             if arr.dtype == np.bool_:
                 if len(arr) != len(self):
@@ -285,6 +297,10 @@ class RLEArray(ExtensionArray):
             sub = orig[self._projection.projection_slice]
         else:
             sub = orig
+
+        # prepare index
+        if is_array_like(index) or isinstance(index, list):
+            index = _normalize_arraylike_indexing(index)
 
         # modify master data through view
         sub[index] = data
