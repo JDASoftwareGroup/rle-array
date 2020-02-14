@@ -309,7 +309,7 @@ class RLEArray(ExtensionArray):
 
     def isna(self) -> "RLEArray":
         _logger.debug("RLEArray.isna()")
-        return RLEArray(data=np.isnan(self._data), positions=self._positions.copy())
+        return RLEArray(data=pd.isna(self._data), positions=self._positions.copy())
 
     def take(
         self, indices: Sequence[int], allow_fill: bool = False, fill_value: Any = None
