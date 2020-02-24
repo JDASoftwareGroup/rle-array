@@ -40,7 +40,7 @@ _logger = logging.getLogger(__name__)
 
 def _normalize_arraylike_indexing(arr: Any) -> np.ndarray:
     """
-    Normalize arralike index arguments for ``__getitem__`` and ``__setitem__``.
+    Normalize array-like index arguments for ``__getitem__`` and ``__setitem__``.
 
     This is required since pandas can pass us many different types with potentially nullable data.
 
