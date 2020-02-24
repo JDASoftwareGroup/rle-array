@@ -234,16 +234,10 @@ def test_unary_operator_array(rle_series, uncompressed_series, unary_operator):
 def test_unary_bool_operator(
     rle_bool_series, uncompressed_bool_series, unary_bool_operator
 ):
-    if unary_bool_operator in (operator.inv,):
-        # series implementation seems to cast the rle-array to numpy
-        dtype = bool
-    else:
-        dtype = RLEDtype(bool)
-
     actual = unary_bool_operator(rle_bool_series)
-    assert actual.dtype == dtype
+    assert actual.dtype == RLEDtype(bool)
 
-    expected = unary_bool_operator(uncompressed_bool_series).astype(dtype)
+    expected = unary_bool_operator(uncompressed_bool_series).astype(RLEDtype(bool))
     pd.testing.assert_series_equal(actual, expected)
 
 
