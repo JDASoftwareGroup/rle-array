@@ -185,6 +185,28 @@ def test_auto_convert_to_rle_ok(orig, threshold, expected):
     pdt.assert_frame_equal(actual, expected)
 
 
+def test_datetime_warns():
+    df = pd.DataFrame(
+        {
+            "i1": pd.Series([1], dtype=np.int64),
+            "d1": pd.Series([pd.Timestamp("2020-01-01")], dtype="datetime64[ns]"),
+            "i2": pd.Series([1], dtype=np.int64),
+            "d2": pd.Series([pd.Timestamp("2020-01-01")], dtype="datetime64[ns]"),
+        }
+    )
+    with pytest.warns(None) as record:
+        auto_convert_to_rle(df, 0.5)
+    assert len(record) == 2
+    assert (
+        str(record[0].message)
+        == "Column d1 is would use a DatetimeBlock and can currently not be RLE compressed."
+    )
+    assert (
+        str(record[1].message)
+        == "Column d2 is would use a DatetimeBlock and can currently not be RLE compressed."
+    )
+
+
 def test_auto_convert_to_rle_threshold_out_of_range():
     df = pd.DataFrame({"x": [1]})
 

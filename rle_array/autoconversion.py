@@ -1,3 +1,4 @@
+import warnings
 from typing import Union
 
 import numpy as np
@@ -65,17 +66,22 @@ def auto_convert_to_rle(df: pd.DataFrame, threshold: float = 1.0) -> pd.DataFram
 
         dtype = series.dtype
 
-        if (not _is_rle_dtype(dtype)) and (not _uses_datetimeblock(dtype)):
-            array_rle = RLEArray._from_sequence(
-                scalars=array_orig, dtype=dtype, copy=True
-            )
-            if threshold == 1.0:
-                array_target = array_rle
-            elif threshold > 0:
-                if (len(array_orig) == 0) or (
-                    array_rle.nbytes / array_orig.nbytes <= threshold
-                ):
+        if not _is_rle_dtype(dtype):
+            if _uses_datetimeblock(dtype):
+                warnings.warn(
+                    f"Column {col} is would use a DatetimeBlock and can currently not be RLE compressed."
+                )
+            else:
+                array_rle = RLEArray._from_sequence(
+                    scalars=array_orig, dtype=dtype, copy=True
+                )
+                if threshold == 1.0:
                     array_target = array_rle
+                elif threshold > 0:
+                    if (len(array_orig) == 0) or (
+                        array_rle.nbytes / array_orig.nbytes <= threshold
+                    ):
+                        array_target = array_rle
 
         data[col] = array_target
 
