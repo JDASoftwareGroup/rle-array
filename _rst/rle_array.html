@@ -7,11 +7,11 @@
     <title>rle_array package &#8212; rle-array  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rle_array.array module" href="rle_array.array.html" />
@@ -39,6 +39,7 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="rle_array.array.html">rle_array.array module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rle_array.autoconversion.html">rle_array.autoconversion module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rle_array.dtype.html">rle_array.dtype module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rle_array.testing.html">rle_array.testing module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rle_array.types.html">rle_array.types module</a></li>
@@ -47,6 +48,25 @@
 </div>
 <div class="section" id="module-rle_array">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rle_array" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="rle_array.auto_convert_to_rle">
+<code class="sig-name descname">auto_convert_to_rle</code><span class="sig-paren">(</span><em class="sig-param">df: pandas.core.frame.DataFrame</em>, <em class="sig-param">threshold: float = 1.0</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#rle_array.auto_convert_to_rle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-convert given DataFrame to RLE compressed DataFrame.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Datetime columns are currently not compressed due to pandas not supporting them.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Input DataFrame, may already contain RLE columns.</p></li>
+<li><p><strong>threshold</strong> – Compression threshold (<code class="docutils literal notranslate"><span class="pre">1</span></code> compresses all, <code class="docutils literal notranslate"><span class="pre">0.5</span></code> compresses if at least 50% memory are safed, <code class="docutils literal notranslate"><span class="pre">0.0</span></code> does
+not compress at all).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="class">
 <dt id="rle_array.RLEArray">
 <em class="property">class </em><code class="sig-name descname">RLEArray</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.ndarray</em>, <em class="sig-param">positions: numpy.ndarray</em><span class="sig-paren">)</span><a class="headerlink" href="#rle_array.RLEArray" title="Permalink to this definition">¶</a></dt>
@@ -457,6 +477,7 @@ instances of <cite>type</cite>.</p>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">rle_array package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="rle_array.array.html">rle_array.array module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rle_array.autoconversion.html">rle_array.autoconversion module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rle_array.dtype.html">rle_array.dtype module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rle_array.testing.html">rle_array.testing module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rle_array.types.html">rle_array.types module</a></li>
@@ -490,7 +511,7 @@ instances of <cite>type</cite>.</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -507,7 +528,7 @@ instances of <cite>type</cite>.</p>
       &copy;2019, JDA Software, Inc.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

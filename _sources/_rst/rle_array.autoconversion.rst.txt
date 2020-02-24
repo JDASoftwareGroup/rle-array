@@ -1,0 +1,7 @@
+rle\_array.autoconversion module
+================================
+
+.. automodule:: rle_array.autoconversion
+   :members:
+   :undoc-members:
+   :show-inheritance:
