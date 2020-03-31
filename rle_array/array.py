@@ -38,7 +38,7 @@ from .types import POSITIONS_DTYPE
 _logger = logging.getLogger(__name__)
 
 
-def _normalize_arraylike_indexing(arr: Any) -> np.ndarray:
+def _normalize_arraylike_indexing(arr: Any, length: int) -> np.ndarray:
     """
     Normalize array-like index arguments for ``__getitem__`` and ``__setitem__``.
 
@@ -48,12 +48,11 @@ def _normalize_arraylike_indexing(arr: Any) -> np.ndarray:
     ----------
     arr
         Index argument passed to ``__getitem__`` and ``__setitem__`` if arraylike.
+    length
+        Array length.
     """
     if isinstance(arr, BooleanArray):
-        try:
-            return np.asarray(arr, dtype=bool)
-        except ValueError:
-            raise ValueError("Cannot mask with a boolean indexer containing NA values")
+        result = np.asarray(arr.fillna(False), dtype=bool)
     elif isinstance(arr, IntegerArray):
         try:
             return np.asarray(arr, dtype=int)
@@ -62,15 +61,20 @@ def _normalize_arraylike_indexing(arr: Any) -> np.ndarray:
                 "Cannot index with an integer indexer containing NA values"
             )
     elif isinstance(arr, RLEArray):
-        return np.asarray(arr, dtype=arr.dtype._dtype)
+        result = np.asarray(arr, dtype=arr.dtype._dtype)
     elif isinstance(arr, list):
         if any((pd.isna(x) for x in arr)):
             raise ValueError(
                 "Cannot index with an integer indexer containing NA values"
             )
-        return np.asarray(arr)
+        result = np.asarray(arr)
     else:
-        return np.asarray(arr)
+        result = np.asarray(arr)
+
+    if (result.dtype == np.bool_) and (len(result) != length):
+        raise IndexError("Indexer has wrong length")
+
+    return result
 
 
 class _ViewMaster:
@@ -247,11 +251,9 @@ class RLEArray(ExtensionArray):
             warnings.warn(
                 "performance: __getitem__ with list is slow", PerformanceWarning
             )
-            arr = _normalize_arraylike_indexing(arr)
+            arr = _normalize_arraylike_indexing(arr, len(self))
 
             if arr.dtype == np.bool_:
-                if len(arr) != len(self):
-                    raise IndexError("boolean mask does not have correct length")
                 arr = np.arange(len(self))[arr]
             else:
                 arr = arr.astype(int)
@@ -300,7 +302,7 @@ class RLEArray(ExtensionArray):
 
         # prepare index
         if is_array_like(index) or isinstance(index, list):
-            index = _normalize_arraylike_indexing(index)
+            index = _normalize_arraylike_indexing(index, len(self))
 
         # modify master data through view
         sub[index] = data
