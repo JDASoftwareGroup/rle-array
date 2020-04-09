@@ -34,9 +34,9 @@
             
   <div class="section" id="module-rle_array.array">
 <span id="rle-array-array-module"></span><h1>rle_array.array module<a class="headerlink" href="#module-rle_array.array" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="rle_array.array.RLEArray">
-<em class="property">class </em><code class="sig-name descname">RLEArray</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.ndarray</em>, <em class="sig-param">positions: numpy.ndarray</em><span class="sig-paren">)</span><a class="headerlink" href="#rle_array.array.RLEArray" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">RLEArray</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">numpy.ndarray</a></span></em>, <em class="sig-param"><span class="n">positions</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">numpy.ndarray</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rle_array.array.RLEArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.core.arrays.base.ExtensionArray</span></code></a></p>
 <p>Run-length encoded array.</p>
 <dl class="field-list simple">
@@ -48,19 +48,19 @@
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.all">
-<code class="sig-name descname">all</code><span class="sig-paren">(</span><em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#rle_array.array.RLEArray.all" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">bool</a><a class="headerlink" href="#rle_array.array.RLEArray.all" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.any">
-<code class="sig-name descname">any</code><span class="sig-paren">(</span><em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#rle_array.array.RLEArray.any" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">any</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">bool</a><a class="headerlink" href="#rle_array.array.RLEArray.any" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.astype">
-<code class="sig-name descname">astype</code><span class="sig-paren">(</span><em class="sig-param">dtype: Any</em>, <em class="sig-param">copy: bool = True</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.astype" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">astype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span></em>, <em class="sig-param"><span class="n">copy</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.astype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cast to a NumPy array with ‘dtype’.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -80,9 +80,9 @@ new dtype.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; rle_array.array.RLEArray<a class="headerlink" href="#rle_array.array.RLEArray.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#rle_array.array.RLEArray" title="rle_array.array.RLEArray">rle_array.array.RLEArray</a><a class="headerlink" href="#rle_array.array.RLEArray.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a copy of the array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -94,9 +94,9 @@ new dtype.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.dropna">
-<code class="sig-name descname">dropna</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; rle_array.array.RLEArray<a class="headerlink" href="#rle_array.array.RLEArray.dropna" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dropna</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#rle_array.array.RLEArray" title="rle_array.array.RLEArray">rle_array.array.RLEArray</a><a class="headerlink" href="#rle_array.array.RLEArray.dropna" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return ExtensionArray without NA values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -108,15 +108,15 @@ new dtype.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.dtype">
 <em class="property">property </em><code class="sig-name descname">dtype</code><a class="headerlink" href="#rle_array.array.RLEArray.dtype" title="Permalink to this definition">¶</a></dt>
 <dd><p>An instance of ‘ExtensionDtype’.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.fillna">
-<code class="sig-name descname">fillna</code><span class="sig-paren">(</span><em class="sig-param">value: Any = None</em>, <em class="sig-param">method: Optional[str] = None</em>, <em class="sig-param">limit: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.fillna" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fillna</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">method</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">limit</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.fillna" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill NA/NaN values using the specified method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -144,9 +144,9 @@ filled.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.isna">
-<code class="sig-name descname">isna</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; rle_array.array.RLEArray<a class="headerlink" href="#rle_array.array.RLEArray.isna" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">isna</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#rle_array.array.RLEArray" title="rle_array.array.RLEArray">rle_array.array.RLEArray</a><a class="headerlink" href="#rle_array.array.RLEArray.isna" title="Permalink to this definition">¶</a></dt>
 <dd><p>A 1-D array indicating if each value is missing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -168,45 +168,45 @@ returned.</p>
 </ul>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.kurt">
-<code class="sig-name descname">kurt</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.kurt" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">kurt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.kurt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.max">
-<code class="sig-name descname">max</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em>, <em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.max" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">max</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.max" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.mean">
-<code class="sig-name descname">mean</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em>, <em class="sig-param">dtype: Optional[Any] = None</em>, <em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.mean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">mean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">Any</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.mean" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.median">
-<code class="sig-name descname">median</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em>, <em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.median" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">median</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.median" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.min">
-<code class="sig-name descname">min</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em>, <em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.min" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">min</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.min" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.nbytes">
 <em class="property">property </em><code class="sig-name descname">nbytes</code><a class="headerlink" href="#rle_array.array.RLEArray.nbytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of bytes needed to store this object in memory.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.prod">
-<code class="sig-name descname">prod</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em>, <em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.prod" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">prod</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.prod" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.shift">
-<code class="sig-name descname">shift</code><span class="sig-paren">(</span><em class="sig-param">periods: int = 1</em>, <em class="sig-param">fill_value: object = None</em><span class="sig-paren">)</span> &#x2192; rle_array.array.RLEArray<a class="headerlink" href="#rle_array.array.RLEArray.shift" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">shift</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">periods</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">fill_value</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">object</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#rle_array.array.RLEArray" title="rle_array.array.RLEArray">rle_array.array.RLEArray</a><a class="headerlink" href="#rle_array.array.RLEArray.shift" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shift values by desired number.</p>
 <p>Newly introduced missing values are filled with
 <code class="docutils literal notranslate"><span class="pre">self.dtype.na_value</span></code>.</p>
@@ -241,24 +241,24 @@ len(self) is returned, with all values filled with
 <code class="docutils literal notranslate"><span class="pre">self.dtype.na_value</span></code>.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.skew">
-<code class="sig-name descname">skew</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.skew" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">skew</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.skew" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.std">
-<code class="sig-name descname">std</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em>, <em class="sig-param">ddof: int = 1</em>, <em class="sig-param">dtype: Optional[Any] = None</em>, <em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.std" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">std</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">ddof</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">Any</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.std" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.sum">
-<code class="sig-name descname">sum</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em>, <em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.sum" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.sum" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.take">
-<code class="sig-name descname">take</code><span class="sig-paren">(</span><em class="sig-param">indices: Sequence[int], allow_fill: bool = False, fill_value: Any = None</em><span class="sig-paren">)</span> &#x2192; rle_array.array.RLEArray<a class="headerlink" href="#rle_array.array.RLEArray.take" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">take</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indices</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Sequence</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">allow_fill</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fill_value</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#rle_array.array.RLEArray" title="rle_array.array.RLEArray">rle_array.array.RLEArray</a><a class="headerlink" href="#rle_array.array.RLEArray.take" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take elements from an array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -333,19 +333,19 @@ extension array to object dtype. This uses the helper method
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.value_counts">
-<code class="sig-name descname">value_counts</code><span class="sig-paren">(</span><em class="sig-param">dropna: bool = True</em><span class="sig-paren">)</span> &#x2192; pandas.core.series.Series<a class="headerlink" href="#rle_array.array.RLEArray.value_counts" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">value_counts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">pandas.core.series.Series</a><a class="headerlink" href="#rle_array.array.RLEArray.value_counts" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.var">
-<code class="sig-name descname">var</code><span class="sig-paren">(</span><em class="sig-param">skipna: bool = True</em>, <em class="sig-param">ddof: int = 1</em>, <em class="sig-param">dtype: Optional[Any] = None</em>, <em class="sig-param">axis: Optional[int] = 0</em>, <em class="sig-param">out: Any = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.var" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">var</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">ddof</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">Any</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.var" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rle_array.array.RLEArray.view">
-<code class="sig-name descname">view</code><span class="sig-paren">(</span><em class="sig-param">dtype: Optional[Any] = None</em><span class="sig-paren">)</span> &#x2192; Any<a class="headerlink" href="#rle_array.array.RLEArray.view" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">view</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">Any</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.array.RLEArray.view" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a view on the array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -439,7 +439,7 @@ extension array to object dtype. This uses the helper method
       &copy;2019, JDA Software, Inc.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
