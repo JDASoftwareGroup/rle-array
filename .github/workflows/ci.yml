@@ -67,6 +67,16 @@ jobs:
       - name: Shellcheck
         shell: bash -l {0}
         run: shellcheck scripts/*.sh
+      - name: Preserve Dist
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
+      - name: Preserve Docs
+        uses: actions/upload-artifact@v1
+        with:
+          name: docs
+          path: docs/_build/html
       - name: Codecov
         uses: codecov/codecov-action@v1
         with:
