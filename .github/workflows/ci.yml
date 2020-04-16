@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Conda Bootstrap
         uses: goanpeca/setup-miniconda@v1
         with:
@@ -61,9 +61,22 @@ jobs:
         run: |
           python setup.py build_sphinx
           touch ./docs/_build/html/.nojekyll
+      - name: Build Wheel
+        shell: bash -l {0}
+        run: python setup.py sdist bdist_wheel
       - name: Shellcheck
         shell: bash -l {0}
         run: shellcheck scripts/*.sh
+      - name: Preserve Dist
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
+      - name: Preserve Docs
+        uses: actions/upload-artifact@v1
+        with:
+          name: docs
+          path: docs/_build/html
       - name: Codecov
         uses: codecov/codecov-action@v1
         with:
@@ -78,8 +91,8 @@ jobs:
           password: ${{ secrets.PYPI_PASSWORD }}
       - name: Deploy Docs
         if: github.event_name == 'push' && github.event.ref == 'refs/heads/master' && matrix.python == '3.7'
-        uses: peaceiris/actions-gh-pages@v2.5.0
-        env:
-          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          PUBLISH_BRANCH: gh-pages
-          PUBLISH_DIR: ./docs/_build/html
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_branch: gh-pages
+          publish_dir: ./docs/_build/html
