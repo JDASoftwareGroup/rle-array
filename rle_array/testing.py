@@ -77,7 +77,10 @@ def _setup_dim_df(n_dims: int, size: int) -> pd.DataFrame:
 
 def _add_const_cols(df: pd.DataFrame, n_dims: int, size: int) -> pd.DataFrame:
     for dims in itertools.chain(
-        *(itertools.combinations(range(n_dims), l + 1) for l in range(n_dims))
+        *(
+            itertools.combinations(range(n_dims), dims_len + 1)
+            for dims_len in range(n_dims)
+        )
     ):
         data = None
         for d in dims:
