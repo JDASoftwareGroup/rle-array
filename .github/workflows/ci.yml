@@ -30,6 +30,8 @@ jobs:
           conda config --set always_yes yes
           conda config --set changeps1 no
           conda config --set pip_interop_enabled True
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v2
       - name: Foo
         shell: bash -l {0}
         run: echo "::error file=setup.py,line=10,col=2::Something went wrong"
