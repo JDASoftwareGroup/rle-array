@@ -1,0 +1,48 @@
+[build-system]
+requires = [
+    "poetry>=0.12",
+]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "rle-array"
+description = "Run-length encoded pandas."
+authors= [
+    "JDA Software, Inc",
+]
+version = "0.1"
+readme = "README.rst"
+license = "MIT"
+packages = [
+    { include = "rle_array" },
+]
+repository = "https://github.com/JDASoftwareGroup/rle_array"
+keywords = [
+    "python",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.6.1,<3.9"
+numba = ">=0.45"
+numpy = ">=1.17"
+pandas = ">=1.0.3,<2"
+
+[tool.poetry.dev-dependencies]
+asv = "*"
+black = "19.10b0"
+flake8-mutable = "1.2.0"
+flake8 = "3.8.3"
+isort = "5.0.9"
+mypy = "*"
+pytest = "*"
+pytest-cov = "*"
+setuptools_scm = "*"
+sphinx = "*"
