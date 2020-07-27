@@ -457,7 +457,7 @@ class RLEArray(ExtensionArray):
         if n == 0:
             return self.dtype.na_value
         else:
-            return np.dot(data, lengths) / self.dtype._dtype.type(n)
+            return np.dot(data, lengths) / np.float64(n)
 
     def median(
         self, skipna: bool = True, axis: Optional[int] = 0, out: Any = None
