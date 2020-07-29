@@ -49,3 +49,7 @@ pytest = ">=6"
 pytest-cov = "*"
 setuptools_scm = "*"
 sphinx = "*"
+
+[tool.pytest.ini_options]
+addopts = "--cov=rle_array --cov-report term-missing --cov-report xml"
+testpath = "tests"
