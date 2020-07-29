@@ -11,7 +11,7 @@ profile = "black"
 name = "rle-array"
 description = "Run-length encoded pandas."
 authors= [
-    "JDA Software, Inc",
+    "Blue Yonder Group, Inc",
 ]
 version = "0.1"
 readme = "README.rst"

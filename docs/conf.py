@@ -16,8 +16,8 @@ apidoc.main(apidoc_parameters)
 sys.path.append(os.path.abspath(os.path.join(__location__, "sphinxext")))
 
 add_module_names = False
-author = "JDA Software, Inc"
-copyright = "2019, JDA Software, Inc"
+author = "Blue Yonder Group, Inc"
+copyright = "2019-2020, Blue Yonder Group, Inc"
 project = "rle-array"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 extensions = [
