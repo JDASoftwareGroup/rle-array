@@ -21,20 +21,13 @@ tooling. See the "Development Plan" in the README for the generic prioritization
 ## Development
 
 ### Installation
-To get started, set up a new virtual environment and install all requirements, either using pip:
+To get started, set up a new virtual environment and install all requirements:
 
 ```bash
 virtualenv --python=python3.6 .venv
 source .venv/bin/activate
-pip install -e .[testing]
-```
-
-or using conda:
-
-```bash
-conda create --name=rle_array shellcheck --file=requirements.txt --file=test-requirements.txt
-conda activate rle_array
-pip install -e .[testing]
+pip install poetry
+poetry install
 ```
 
 ### Code style
@@ -48,7 +41,7 @@ To ensure a consistent code style across the code base we're using the following
 We have a convenience script that runs all these tools and a code style check for you:
 
 ```bash
-./scripts/fmt.sh
+poetry run ./scripts/fmt.sh
 ```
 
 ### Testing
@@ -56,7 +49,7 @@ There are different tools that ensure a well tested and presented library. To ru
 development), use:
 
 ```bash
-./scripts/test.sh
+poetry run ./scripts/test.sh
 ```
 
 ### Pytest
@@ -64,7 +57,7 @@ We're using [pytest](https://pytest.org) as a testing framework and make heavy u
 To run the tests simply run:
 
 ```bash
-pytest
+poetry run pytest
 ```
 
 ### Benchmarks
@@ -72,21 +65,21 @@ For performance critical code paths we have [asv](https://asv.readthedocs.io/) b
 `asv_bench`. To run the benchmarks a single time and receive immediate feedback run
 
 ```bash
-asv run --python=same --show-stderr
+poetry run asv run --python=same --show-stderr
 ```
 
 ### Documentation
 Documentation is created using [Sphinx](https://www.sphinx-doc.org/) and can be build by using:
 
 ```bash
-python setup.py build_sphinx
+poetry run python setup.py build_sphinx
 ```
 
 ### Typing
 We use [mypy](http://mypy-lang.org/) to check python types. It can be run using:
 
 ```bash
-mypy .
+poetry run mypy .
 ```
 
 ## Performance Improvements

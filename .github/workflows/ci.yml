@@ -17,55 +17,35 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Conda Bootstrap
-        uses: goanpeca/setup-miniconda@v1
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
         with:
-          auto-update-conda: true
           python-version: ${{ matrix.python }}
-      - name: Conda Config
-        run: |
-          conda config --add channels conda-forge
-          conda config --add channels numba
-          conda config --set channel_priority strict
-          conda config --set always_yes yes
-          conda config --set changeps1 no
-          conda config --set pip_interop_enabled True
-      - name: Conda Install
-        shell: bash -l {0}
-        run: conda install --yes shellcheck --file=requirements.txt --file=test-requirements.txt
-      - name: Pip Install
-        shell: bash -l {0}
-        run: pip install --no-deps -e .[testing]
+      - name: Install Poetry Itself
+        run: pip install poetry
+      - name: Poetry Install
+        run: poetry install
       - name: Flake8
-        shell: bash -l {0}
-        run: flake8
+        run: poetry run flake8
       - name: Mypy
-        shell: bash -l {0}
-        run: mypy .
+        run: poetry run mypy .
       - name: Black
-        shell: bash -l {0}
-        run: black --check .
+        run: poetry run black --check .
       - name: Isort
-        shell: bash -l {0}
-        run: isort --recursive --check-only
+        run: poetry run isort --recursive --check-only
       - name: Pytest
-        shell: bash -l {0}
-        run: pytest
+        run: poetry run pytest
       - name: ASV
-        shell: bash -l {0}
         run: |
-          asv --config ./asv_bench/asv.conf.json machine --machine travis --os unknown --arch unknown --cpu unknown --ram unknown
-          asv --config ./asv_bench/asv.conf.json run --show-stderr --environment existing --quick
+          poetry run asv --config ./asv_bench/asv.conf.json machine --machine travis --os unknown --arch unknown --cpu unknown --ram unknown
+          poetry run asv --config ./asv_bench/asv.conf.json run --show-stderr --environment existing --quick
       - name: Sphinx
-        shell: bash -l {0}
         run: |
-          python setup.py build_sphinx
+          poetry run python setup.py build_sphinx
           touch ./docs/_build/html/.nojekyll
-      - name: Build Wheel
-        shell: bash -l {0}
-        run: python setup.py sdist bdist_wheel
+      - name: Build
+        run: poetry build
       - name: Shellcheck
-        shell: bash -l {0}
         run: shellcheck scripts/*.sh
       - name: Preserve Dist
         uses: actions/upload-artifact@v1
