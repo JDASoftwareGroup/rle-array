@@ -1,7 +1,10 @@
+from typing import Any, Generator, List, Optional
+
 import numpy as np
-import numpy.testing as npt
 import pandas as pd
 import pytest
+from _pytest.fixtures import SubRequest
+from numpy import testing as npt
 
 import rle_array._algorithms
 from rle_array._algorithms import (
@@ -24,7 +27,7 @@ from rle_array.types import POSITIONS_DTYPE
 
 
 @pytest.fixture(params=[True, False], autouse=True)
-def with_jit(request):
+def with_jit(request: SubRequest) -> Generator[None, None, None]:
     if request.param:
         yield
     else:
@@ -45,7 +48,7 @@ def with_jit(request):
 
 
 @pytest.mark.parametrize(
-    "positions,expected",
+    "positions, expected",
     [
         (
             # positions
@@ -67,13 +70,13 @@ def with_jit(request):
         ),
     ],
 )
-def test_calc_lengths(positions, expected):
+def test_calc_lengths(positions: np.ndarray, expected: np.ndarray) -> None:
     actual = calc_lengths(positions)
     npt.assert_array_equal(actual, expected)
 
 
 @pytest.mark.parametrize(
-    "scalars,data,positions",
+    "scalars, data, positions",
     [
         (
             # scalars
@@ -129,14 +132,14 @@ def test_calc_lengths(positions, expected):
         ),
     ],
 )
-def test_compress(scalars, data, positions):
+def test_compress(scalars: np.ndarray, data: np.ndarray, positions: np.ndarray) -> None:
     data_actual, positions_actual = compress(scalars)
     npt.assert_array_equal(data_actual, data)
     npt.assert_array_equal(positions_actual, positions)
 
 
 @pytest.mark.parametrize(
-    "data_parts,positions_parts,data,positions",
+    "data_parts, positions_parts, data, positions",
     [
         (
             # data_parts
@@ -214,14 +217,19 @@ def test_compress(scalars, data, positions):
         ),
     ],
 )
-def test_concat(data_parts, positions_parts, data, positions):
+def test_concat(
+    data_parts: List[np.ndarray],
+    positions_parts: List[np.ndarray],
+    data: np.ndarray,
+    positions: np.ndarray,
+) -> None:
     data_actual, positions_actual = concat(data_parts, positions_parts)
     npt.assert_array_equal(data_actual, data)
     npt.assert_array_equal(positions_actual, positions)
 
 
 @pytest.mark.parametrize(
-    "data,positions,dtype,scalars",
+    "data, positions, dtype, scalars",
     [
         (
             # dtype
@@ -265,13 +273,18 @@ def test_concat(data_parts, positions_parts, data, positions):
         ),
     ],
 )
-def test_decompress(data, positions, dtype, scalars):
+def test_decompress(
+    data: np.ndarray,
+    positions: np.ndarray,
+    dtype: Optional[np.dtype],
+    scalars: np.ndarray,
+) -> None:
     scalars_actual = decompress(data, positions, dtype)
     npt.assert_array_equal(scalars_actual, scalars)
 
 
 @pytest.mark.parametrize(
-    "scalars,changes",
+    "scalars, changes",
     [
         (
             # scalars
@@ -320,13 +333,13 @@ def test_decompress(data, positions, dtype, scalars):
         ),
     ],
 )
-def test_detect_changes(scalars, changes):
+def test_detect_changes(scalars: np.ndarray, changes: np.ndarray) -> None:
     changes_actual = detect_changes(scalars)
     npt.assert_array_equal(changes_actual, changes)
 
 
 @pytest.mark.parametrize(
-    "data_before,positions_before,data_after,positions_after",
+    "data_before, positions_before, data_after, positions_after",
     [
         (
             # data_before
@@ -370,14 +383,19 @@ def test_detect_changes(scalars, changes):
         ),
     ],
 )
-def test_dropna(data_before, positions_before, data_after, positions_after):
+def test_dropna(
+    data_before: np.ndarray,
+    positions_before: np.ndarray,
+    data_after: np.ndarray,
+    positions_after: np.ndarray,
+) -> None:
     data_actual, positions_actual = dropna(data_before, positions_before)
     npt.assert_array_equal(data_actual, data_after)
     npt.assert_array_equal(positions_actual, positions_after)
 
 
 @pytest.mark.parametrize(
-    "data,positions,i,element",
+    "data, positions, i, element",
     [
         (
             # data
@@ -431,13 +449,15 @@ def test_dropna(data_before, positions_before, data_after, positions_after):
         ),
     ],
 )
-def test_find_single_index_ok(data, positions, i, element):
+def test_find_single_index_ok(
+    data: np.ndarray, positions: np.ndarray, i: int, element: int
+) -> None:
     element_actual = find_single_index(data, positions, i)
     assert element_actual == element
 
 
 @pytest.mark.parametrize(
-    "data,positions,i",
+    "data, positions, i",
     [
         (
             # data
@@ -465,13 +485,15 @@ def test_find_single_index_ok(data, positions, i, element):
         ),
     ],
 )
-def test_find_single_index_raise(data, positions, i):
+def test_find_single_index_raise(
+    data: np.ndarray, positions: np.ndarray, i: int
+) -> None:
     with pytest.raises(IndexError):
         find_single_index(data, positions, i)
 
 
 @pytest.mark.parametrize(
-    "data_before,positions_before,s,data_after,positions_after",
+    "data_before, positions_before, s, data_after, positions_after",
     [
         (
             # data_before
@@ -859,14 +881,20 @@ def test_find_single_index_raise(data, positions, i):
         ),
     ],
 )
-def test_find_slice(data_before, positions_before, s, data_after, positions_after):
+def test_find_slice(
+    data_before: np.ndarray,
+    positions_before: np.ndarray,
+    s: slice,
+    data_after: np.ndarray,
+    positions_after: np.ndarray,
+) -> None:
     data_actual, positions_actual = find_slice(data_before, positions_before, s)
     npt.assert_array_equal(data_actual, data_after)
     npt.assert_array_equal(positions_actual, positions_after)
 
 
 @pytest.mark.parametrize(
-    "data,positions,values",
+    "data, positions, values",
     [
         (
             # data
@@ -894,7 +922,9 @@ def test_find_slice(data_before, positions_before, s, data_after, positions_afte
         ),
     ],
 )
-def test_gen_iterator(data, positions, values):
+def test_gen_iterator(
+    data: np.ndarray, positions: np.ndarray, values: List[Any]
+) -> None:
     it = gen_iterator(data, positions)
     assert hasattr(it, "__iter__")
     values_actual = list(it)
@@ -902,7 +932,7 @@ def test_gen_iterator(data, positions, values):
 
 
 @pytest.mark.parametrize(
-    "positions,length",
+    "positions, length",
     [
         (
             # positions
@@ -924,13 +954,13 @@ def test_gen_iterator(data, positions, values):
         ),
     ],
 )
-def test_get_len(positions, length):
+def test_get_len(positions: np.ndarray, length: int) -> None:
     length_actual = get_len(positions)
     assert length_actual == length
 
 
 @pytest.mark.parametrize(
-    "data_before,positions_before,data_after,positions_after",
+    "data_before, positions_before, data_after, positions_after",
     [
         (
             # data_before
@@ -964,14 +994,19 @@ def test_get_len(positions, length):
         ),
     ],
 )
-def test_recompress(data_before, positions_before, data_after, positions_after):
+def test_recompress(
+    data_before: np.ndarray,
+    positions_before: np.ndarray,
+    data_after: np.ndarray,
+    positions_after: np.ndarray,
+) -> None:
     data_actual, positions_actual = recompress(data_before, positions_before)
     npt.assert_array_equal(data_actual, data_after)
     npt.assert_array_equal(positions_actual, positions_after)
 
 
 @pytest.mark.parametrize(
-    "data_before,positions_before,indices,data_after,positions_after",
+    "data_before, positions_before, indices, data_after, positions_after",
     [
         (
             # data_before
@@ -1036,8 +1071,12 @@ def test_recompress(data_before, positions_before, data_after, positions_after):
     ],
 )
 def test_take_no_fill_ok(
-    data_before, positions_before, indices, data_after, positions_after
-):
+    data_before: np.ndarray,
+    positions_before: np.ndarray,
+    indices: np.ndarray,
+    data_after: np.ndarray,
+    positions_after: np.ndarray,
+) -> None:
     data_actual, positions_actual = take(
         data=data_before,
         positions=positions_before,
@@ -1050,7 +1089,7 @@ def test_take_no_fill_ok(
 
 
 @pytest.mark.parametrize(
-    "data_before,positions_before,indices",
+    "data_before, positions_before, indices",
     [
         (
             # data_before
@@ -1070,7 +1109,9 @@ def test_take_no_fill_ok(
         ),
     ],
 )
-def test_take_no_fill_raise(data_before, positions_before, indices):
+def test_take_no_fill_raise(
+    data_before: np.ndarray, positions_before: np.ndarray, indices: np.ndarray
+) -> None:
     with pytest.raises(IndexError):
         take(
             data=data_before,
@@ -1082,7 +1123,7 @@ def test_take_no_fill_raise(data_before, positions_before, indices):
 
 
 @pytest.mark.parametrize(
-    "data_before,positions_before,indices,data_after,positions_after",
+    "data_before, positions_before, indices, data_after, positions_after",
     [
         (
             # data_before
@@ -1147,8 +1188,12 @@ def test_take_no_fill_raise(data_before, positions_before, indices):
     ],
 )
 def test_take_fill_ok(
-    data_before, positions_before, indices, data_after, positions_after
-):
+    data_before: np.ndarray,
+    positions_before: np.ndarray,
+    indices: np.ndarray,
+    data_after: np.ndarray,
+    positions_after: np.ndarray,
+) -> None:
     data_actual, positions_actual = take(
         data=data_before,
         positions=positions_before,
@@ -1161,7 +1206,7 @@ def test_take_fill_ok(
 
 
 @pytest.mark.parametrize(
-    "data_before,positions_before,indices,e",
+    "data_before, positions_before, indices, e",
     [
         (
             # data_before
@@ -1185,7 +1230,9 @@ def test_take_fill_ok(
         ),
     ],
 )
-def test_take_fill_raise(data_before, positions_before, indices, e):
+def test_take_fill_raise(
+    data_before: np.ndarray, positions_before: np.ndarray, indices: np.ndarray, e: type
+) -> None:
     with pytest.raises(e):
         take(
             data=data_before,
@@ -1197,7 +1244,7 @@ def test_take_fill_raise(data_before, positions_before, indices, e):
 
 
 @pytest.mark.parametrize(
-    "indices,allow_fill",
+    "indices, allow_fill",
     [
         (
             # indices
@@ -1225,7 +1272,7 @@ def test_take_fill_raise(data_before, positions_before, indices, e):
         ),
     ],
 )
-def test_take_raises_non_empty_take(indices, allow_fill):
+def test_take_raises_non_empty_take(indices: np.ndarray, allow_fill: bool) -> None:
     data = np.array([], dtype=POSITIONS_DTYPE)
     positions = np.array([], dtype=np.float32)
     with pytest.raises(IndexError, match="cannot do a non-empty take"):
@@ -1247,7 +1294,9 @@ def test_take_raises_non_empty_take(indices, allow_fill):
         (np.array([2, 7]), np.array([1, 5, 7]), np.array([1, 2, 5, 7])),
     ],
 )
-def test_extend_positions(positions1, positions2, expected):
+def test_extend_positions(
+    positions1: np.ndarray, positions2: np.ndarray, expected: np.ndarray
+) -> None:
     actual = extend_positions(positions1, positions2)
     np.testing.assert_array_equal(actual, expected)
 
@@ -1270,6 +1319,11 @@ def test_extend_positions(positions1, positions2, expected):
         ),
     ],
 )
-def test_extend_data(data, positions, extended_positions, expected):
+def test_extend_data(
+    data: np.ndarray,
+    positions: np.ndarray,
+    extended_positions: np.ndarray,
+    expected: np.ndarray,
+) -> None:
     actual = extend_data(data, positions, extended_positions)
     np.testing.assert_array_equal(actual, expected)

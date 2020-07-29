@@ -1,31 +1,31 @@
 import numpy as np
-import numpy.testing as npt
 import pytest
+from numpy import testing as npt
 
 from rle_array import RLEArray
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
 
-def test_view_raises_differnt_dtype():
+def test_view_raises_differnt_dtype() -> None:
     orig = RLEArray._from_sequence(np.arange(10))
     with pytest.raises(ValueError, match="Cannot create view with different dtype"):
         orig.view(np.int8)
 
 
 @pytest.mark.parametrize("dtype", ["none", "numpy", "rle"])
-def test_plain_view(dtype):
+def test_plain_view(dtype: str) -> None:
     orig = RLEArray._from_sequence(np.arange(10))
 
     if dtype == "none":
-        dtype = None
+        dtype_view = None
     elif dtype == "numpy":
-        dtype = orig.dtype._dtype
+        dtype_view = orig.dtype._dtype
     elif dtype == "rle":
-        dtype = orig.dtype
+        dtype_view = orig.dtype
     else:
         raise ValueError(f"unknown dtype variante {dtype}")
-    view = orig.view(dtype)
+    view = orig.view(dtype_view)
 
     assert view is not orig
     assert view.dtype == orig.dtype
@@ -40,7 +40,7 @@ def test_plain_view(dtype):
     npt.assert_array_equal(orig, view)
 
 
-def test_view_tree():
+def test_view_tree() -> None:
     # o-->1-+->11
     #       +->12
     orig = RLEArray._from_sequence(np.arange(10))
@@ -70,7 +70,7 @@ def test_view_tree():
     npt.assert_array_equal(orig, view12)
 
 
-def test_slicing():
+def test_slicing() -> None:
     N = 100
     orig_np = np.arange(N)
     orig_rle = RLEArray._from_sequence(orig_np)

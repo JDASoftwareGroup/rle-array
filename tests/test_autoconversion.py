@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-import pandas.testing as pdt
 import pytest
+from pandas import testing as pdt
 
 from rle_array.autoconversion import auto_convert_to_rle
 from rle_array.dtype import RLEDtype
@@ -180,12 +180,14 @@ pytestmark = pytest.mark.filterwarnings("ignore:performance")
         ),
     ],
 )
-def test_auto_convert_to_rle_ok(orig, threshold, expected):
+def test_auto_convert_to_rle_ok(
+    orig: pd.DataFrame, threshold: float, expected: pd.DataFrame
+) -> None:
     actual = auto_convert_to_rle(orig, threshold)
     pdt.assert_frame_equal(actual, expected)
 
 
-def test_datetime_warns():
+def test_datetime_warns() -> None:
     df = pd.DataFrame(
         {
             "i1": pd.Series([1], dtype=np.int64),
@@ -207,7 +209,7 @@ def test_datetime_warns():
     )
 
 
-def test_auto_convert_to_rle_threshold_out_of_range():
+def test_auto_convert_to_rle_threshold_out_of_range() -> None:
     df = pd.DataFrame({"x": [1]})
 
     with pytest.raises(ValueError, match=r"threshold \(-0.1\) must be in \[0, 1\]"):
