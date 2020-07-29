@@ -32,7 +32,7 @@ jobs:
       - name: Black
         run: poetry run black --check .
       - name: Isort
-        run: poetry run isort --recursive --check-only
+        run: poetry run isort --check-only .
       - name: Pytest
         run: poetry run pytest
       - name: ASV
