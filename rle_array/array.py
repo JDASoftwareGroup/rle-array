@@ -85,12 +85,6 @@ class _ViewAnchor:
     def __init__(self, array: "RLEArray") -> None:
         self.array = ref(array)
 
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, _ViewAnchor):
-            return id(self.array) == id(other.array)
-        else:
-            return False
-
     def __hash__(self) -> int:
         return id(self.array)
 
