@@ -3,4 +3,4 @@
 set -exuo pipefail
 
 black .
-isort --recursive --atomic .
+isort --atomic .

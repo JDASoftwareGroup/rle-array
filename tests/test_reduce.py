@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+from _pytest.fixtures import SubRequest
 
 from rle_array import RLEDtype
 
@@ -8,7 +9,7 @@ pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
 
 @pytest.fixture(params=["single", "multi", "empty", "sparse"])
-def data_orig(request):
+def data_orig(request: SubRequest) -> pd.Series:
     if request.param == "single":
         return pd.Series([1], dtype=int)
     elif request.param == "multi":
@@ -22,7 +23,7 @@ def data_orig(request):
 
 
 @pytest.fixture(params=["single", "multi", "empty"])
-def data_orig_bool(request):
+def data_orig_bool(request: SubRequest) -> pd.Series:
     if request.param == "single":
         return pd.Series([False], dtype=bool)
     elif request.param == "multi":
@@ -34,48 +35,62 @@ def data_orig_bool(request):
 
 
 @pytest.fixture
-def data_rle(data_orig):
+def data_rle(data_orig: pd.Series) -> pd.Series:
     return data_orig.astype(RLEDtype(data_orig.dtype))
 
 
 @pytest.fixture
-def data_rle_bool(data_orig_bool):
+def data_rle_bool(data_orig_bool: pd.Series) -> pd.Series:
     return data_orig_bool.astype(RLEDtype(data_orig_bool.dtype))
 
 
 @pytest.fixture(params=[True, False])
-def skipna(request):
-    return request.param
+def skipna(request: SubRequest) -> bool:
+    b = request.param
+    assert isinstance(b, bool)
+    return b
 
 
 @pytest.fixture(
     params=["min", "max", "mean", "median", "prod", "skew", "std", "sum", "var", "kurt"]
 )
-def name(request):
-    return request.param
+def name(request: SubRequest) -> str:
+    n = request.param
+    assert isinstance(n, str)
+    return n
 
 
 @pytest.fixture(params=["any", "all"])
-def name_bool(request):
-    return request.param
+def name_bool(request: SubRequest) -> str:
+    n = request.param
+    assert isinstance(n, str)
+    return n
 
 
 @pytest.fixture(params=["max", "mean", "median", "min", "prod", "std", "sum", "var"])
-def numpy_op(request):
-    return request.param
+def numpy_op(request: SubRequest) -> str:
+    n = request.param
+    assert isinstance(n, str)
+    return n
 
 
 @pytest.fixture(params=["all", "any"])
-def numpy_op_bool(request):
-    return request.param
+def numpy_op_bool(request: SubRequest) -> str:
+    op = request.param
+    assert isinstance(op, str)
+    return op
 
 
 @pytest.fixture(params=["mean", "std", "var"])
-def numpy_op_with_dtype(request):
-    return request.param
+def numpy_op_with_dtype(request: SubRequest) -> str:
+    op = request.param
+    assert isinstance(op, str)
+    return op
 
 
-def test_reduce(data_orig, data_rle, skipna, name):
+def test_reduce(
+    data_orig: pd.Series, data_rle: pd.Series, skipna: bool, name: str
+) -> None:
     f_orig = getattr(data_orig, name)
     f_rle = getattr(data_rle, name)
     result_orig = f_orig(skipna=skipna)
@@ -86,7 +101,9 @@ def test_reduce(data_orig, data_rle, skipna, name):
     # don't check type here since pandas does some magic casting from numpy to python
 
 
-def test_reduce_bool(data_orig_bool, data_rle_bool, name_bool):
+def test_reduce_bool(
+    data_orig_bool: pd.Series, data_rle_bool: pd.Series, name_bool: str
+) -> None:
     f_orig = getattr(data_orig_bool, name_bool)
     f_rle = getattr(data_rle_bool, name_bool)
     result_orig = f_orig()
@@ -95,25 +112,31 @@ def test_reduce_bool(data_orig_bool, data_rle_bool, name_bool):
     # don't check type here since pandas does some magic casting from numpy to python
 
 
-def test_array_numpy_bool_axis_notimplemented(data_rle_bool, numpy_op_bool):
+def test_array_numpy_bool_axis_notimplemented(
+    data_rle_bool: pd.Series, numpy_op_bool: str
+) -> None:
     f = getattr(data_rle_bool.array, numpy_op_bool)
     with pytest.raises(NotImplementedError, match="Only axis=0 is supported."):
         f(axis=2)
 
 
-def test_array_numpy_bool_out_notimplemented(data_rle_bool, numpy_op_bool):
+def test_array_numpy_bool_out_notimplemented(
+    data_rle_bool: pd.Series, numpy_op_bool: str
+) -> None:
     f = getattr(data_rle_bool.array, numpy_op_bool)
     out = data_rle_bool.array.copy()
     with pytest.raises(NotImplementedError, match="out parameter is not supported."):
         f(out=out)
 
 
-def test_array_reduction_not_implemented(data_rle):
+def test_array_reduction_not_implemented(data_rle: pd.Series) -> None:
     with pytest.raises(NotImplementedError, match="reduction foo is not implemented."):
         data_rle.array._reduce(name="foo")
 
 
-def test_array_numpy_bool(data_orig_bool, data_rle_bool, numpy_op_bool):
+def test_array_numpy_bool(
+    data_orig_bool: pd.Series, data_rle_bool: pd.Series, numpy_op_bool: str
+) -> None:
     f = getattr(np, numpy_op_bool)
     result_orig = f(data_rle_bool.array)
     result_rle = f(data_rle_bool.array)
@@ -121,7 +144,7 @@ def test_array_numpy_bool(data_orig_bool, data_rle_bool, numpy_op_bool):
     assert type(result_orig) == type(result_rle)
 
 
-def test_array_numpy(data_orig, data_rle, numpy_op):
+def test_array_numpy(data_orig: pd.Series, data_rle: pd.Series, numpy_op: str) -> None:
     f = getattr(np, numpy_op)
     result_orig = f(data_orig.array)
     result_rle = f(data_rle.array)
@@ -131,20 +154,20 @@ def test_array_numpy(data_orig, data_rle, numpy_op):
     assert type(result_orig) == type(result_rle)
 
 
-def test_array_numpy_axis_notimplemented(data_rle, numpy_op):
+def test_array_numpy_axis_notimplemented(data_rle: pd.Series, numpy_op: str) -> None:
     f = getattr(data_rle.array, numpy_op)
     with pytest.raises(NotImplementedError, match="Only axis=0 is supported."):
         f(axis=2)
 
 
-def test_array_numpy_out_notimplemented(data_rle, numpy_op):
+def test_array_numpy_out_notimplemented(data_rle: pd.Series, numpy_op: str) -> None:
     f = getattr(data_rle.array, numpy_op)
     out = data_rle.array.copy()
     with pytest.raises(NotImplementedError, match="out parameter is not supported."):
         f(out=out)
 
 
-def test_array_numpy_dtype(data_rle, numpy_op_with_dtype):
+def test_array_numpy_dtype(data_rle: pd.Series, numpy_op_with_dtype: str) -> None:
     f = getattr(np, numpy_op_with_dtype)
     with pytest.raises(NotImplementedError, match="dtype parameter is not supported."):
         f(data_rle.array, dtype=np.float16)

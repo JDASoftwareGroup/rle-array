@@ -1,40 +1,52 @@
-import numpy.testing as npt
-import pandas as pd
-import pandas.testing as pdt
-import pytest
+from typing import Callable, Union, cast
 
-from rle_array import RLEDtype
+import numpy as np
+import pandas as pd
+import pytest
+from _pytest.fixtures import SubRequest
+from numpy import testing as npt
+from pandas import testing as pdt
+
+from rle_array import RLEArray, RLEDtype
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
+FComp = Callable[[Union[pd.Series, np.ndarray], Union[pd.Series, RLEArray]], None]
+
 
 @pytest.fixture
-def series_orig():
+def series_orig() -> pd.Series:
     return pd.Series([1, 1, 2, 3, 3], dtype=int)
 
 
 @pytest.fixture
-def array_orig(series_orig):
+def array_orig(series_orig: pd.Series) -> np.ndarray:
     return series_orig.values
 
 
 @pytest.fixture
-def series_rle(series_orig):
+def series_rle(series_orig: pd.Series) -> pd.Series:
     return series_orig.astype(RLEDtype(series_orig.dtype))
 
 
 @pytest.fixture
-def array_rle(series_rle):
-    return series_rle.values
+def array_rle(series_rle: pd.Series) -> RLEArray:
+    values = series_rle.values
+    assert isinstance(values, RLEArray)
+    return values
 
 
 @pytest.fixture(params=["series", "array"])
-def mode(request):
-    return request.param
+def mode(request: SubRequest) -> str:
+    m = request.param
+    assert isinstance(m, str)
+    return m
 
 
 @pytest.fixture
-def object_orig(series_orig, array_orig, mode):
+def object_orig(
+    series_orig: pd.Series, array_orig: np.ndarray, mode: str
+) -> Union[pd.Series, np.ndarray]:
     if mode == "series":
         return series_orig
     elif mode == "array":
@@ -44,7 +56,9 @@ def object_orig(series_orig, array_orig, mode):
 
 
 @pytest.fixture
-def object_rle(series_rle, array_rle, mode):
+def object_rle(
+    series_rle: pd.Series, array_rle: RLEArray, mode: str
+) -> Union[pd.Series, RLEArray]:
     if mode == "series":
         return series_rle
     elif mode == "array":
@@ -54,23 +68,27 @@ def object_rle(series_rle, array_rle, mode):
 
 
 @pytest.fixture
-def comp(mode):
+def comp(mode: str) -> FComp:
     if mode == "series":
-        return pdt.assert_series_equal
+        return cast(FComp, pdt.assert_series_equal)
     elif mode == "array":
-        return npt.assert_array_equal
+        return cast(FComp, npt.assert_array_equal)
     else:
         raise ValueError(f"Unknown mode {mode}")
 
 
-def test_sum(object_orig, object_rle, comp):
+def test_sum(
+    object_orig: Union[pd.Series, np.ndarray],
+    object_rle: Union[pd.Series, RLEArray],
+    comp: FComp,
+) -> None:
     elements_orig = [object_orig, object_orig]
     elements_rle = [object_rle, object_rle]
     elements_mixed = [object_rle, object_orig]
 
-    result_orig = sum(elements_orig)
-    result_rle = sum(elements_rle)
-    result_mixed = sum(elements_mixed)
+    result_orig: np.int64 = sum(elements_orig)
+    result_rle: np.int64 = sum(elements_rle)
+    result_mixed: np.int64 = sum(elements_mixed)
 
     result_converted1 = result_rle.astype(int)
     comp(result_orig, result_converted1)

@@ -5,7 +5,7 @@ from rle_array import RLEDtype
 
 
 @pytest.mark.parametrize(
-    "a,b,expected",
+    "a, b, expected",
     [
         (
             # a
@@ -33,7 +33,7 @@ from rle_array import RLEDtype
         ),
     ],
 )
-def test_eq(a, b, expected):
+def test_eq(a: RLEDtype, b: RLEDtype, expected: bool) -> None:
     actual = a == b
     assert actual is expected
 
@@ -55,5 +55,5 @@ def test_eq(a, b, expected):
         ),
     ],
 )
-def test_repr(dtype, expected):
+def test_repr(dtype: RLEDtype, expected: str) -> None:
     assert repr(dtype) == expected
