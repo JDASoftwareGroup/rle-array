@@ -79,7 +79,7 @@ def _normalize_arraylike_indexing(arr: Any, length: int) -> np.ndarray:
 
 class _ViewAnchor:
     """
-    Anchor object that references an RLEArray because it is not hashable.
+    Anchor object that references a RLEArray because it is not hashable.
     """
 
     def __init__(self, array: "RLEArray") -> None:
