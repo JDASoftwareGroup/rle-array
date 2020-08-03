@@ -148,10 +148,15 @@ def test_array_numpy(data_orig: pd.Series, data_rle: pd.Series, numpy_op: str) -
     f = getattr(np, numpy_op)
     result_orig = f(data_orig.array)
     result_rle = f(data_rle.array)
-    assert (np.isnan(result_orig) and np.isnan(result_rle)) or (
-        result_orig == result_rle
-    )
-    assert type(result_orig) == type(result_rle)
+    assert (pd.isna(result_orig) and pd.isna(result_rle)) or (result_orig == result_rle)
+    if len(data_orig) > 0:
+        assert type(result_orig) == type(result_rle)
+    else:
+        # pandas might use pd.NA, while we still use float, see https://github.com/pandas-dev/pandas/issues/35475
+        if isinstance(result_orig, type(pd.NA)):
+            assert type(result_rle) == float
+        else:
+            assert type(result_orig) == type(result_rle)
 
 
 def test_array_numpy_axis_notimplemented(data_rle: pd.Series, numpy_op: str) -> None:

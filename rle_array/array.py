@@ -3,12 +3,12 @@ import operator
 import warnings
 from collections import namedtuple
 from typing import Any, Callable, Iterator, Optional, Sequence, Union
-from weakref import WeakSet
+from weakref import WeakSet, ref
 
 import numpy as np
 import pandas as pd
 from pandas.api.extensions import ExtensionArray
-from pandas.arrays import BooleanArray, IntegerArray
+from pandas.arrays import BooleanArray, IntegerArray, StringArray
 from pandas.core import ops
 from pandas.core.dtypes.common import is_array_like
 from pandas.core.dtypes.generic import ABCIndexClass, ABCSeries
@@ -77,6 +77,24 @@ def _normalize_arraylike_indexing(arr: Any, length: int) -> np.ndarray:
     return result
 
 
+class _ViewAnchor:
+    """
+    Anchor object that references an RLEArray because it is not hashable.
+    """
+
+    def __init__(self, array: "RLEArray") -> None:
+        self.array = ref(array)
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, _ViewAnchor):
+            return id(self.array) == id(other.array)
+        else:
+            return False
+
+    def __hash__(self) -> int:
+        return id(self.array)
+
+
 class _ViewMaster:
     """
     Collection of all views to an array.
@@ -87,7 +105,7 @@ class _ViewMaster:
     def __init__(self, data: np.ndarray, positions: np.ndarray):
         self.data = data
         self.positions = positions
-        self.views: WeakSet[RLEArray] = WeakSet()
+        self.views: WeakSet[_ViewAnchor] = WeakSet()
 
     @classmethod
     def register_first(cls, array: "RLEArray") -> "_Projection":
@@ -102,7 +120,7 @@ class _ViewMaster:
             projection_slice=None,
             master=cls(data=array._data, positions=array._positions),
         )
-        projection.master.views.add(array)
+        projection.master.views.add(array._view_anchor)
         return projection
 
     def register_change(
@@ -118,10 +136,10 @@ class _ViewMaster:
         assert array._projection.projection_slice is None
         assert array._projection.master is not self
         assert len(array._projection.master.views) == 1
-        assert array not in self.views
+        assert array._view_anchor not in self.views
 
         array._projection = _Projection(projection_slice=projection_slice, master=self)
-        self.views.add(array)
+        self.views.add(array._view_anchor)
 
     def modify(self, data: np.ndarray, positions: np.ndarray) -> None:
         """
@@ -131,20 +149,22 @@ class _ViewMaster:
         self.positions = positions
 
         for view in self.views:
-            assert view._projection is not None
-            assert view._projection.master is self
+            array = view.array()
+            assert array is not None
+            assert array._projection is not None
+            assert array._projection.master is self
 
-            if view._projection.projection_slice is not None:
+            if array._projection.projection_slice is not None:
                 data2, positions2 = find_slice(
                     data=self.data,
                     positions=self.positions,
-                    s=view._projection.projection_slice,
+                    s=array._projection.projection_slice,
                 )
             else:
                 data2, positions2 = self.data, self.positions
 
-            view._data = data2
-            view._positions = positions2
+            array._data = data2
+            array._positions = positions2
 
 
 _Projection = namedtuple("_Projection", ["master", "projection_slice"])
@@ -209,6 +229,7 @@ class RLEArray(ExtensionArray):
         self._dtype = RLEDtype(data.dtype)
         self._data = data
         self._positions = positions
+        self._view_anchor = _ViewAnchor(self)
         self._projection = _ViewMaster.register_first(self)
 
     @property
@@ -281,9 +302,6 @@ class RLEArray(ExtensionArray):
             if arr < 0:
                 arr = arr + len(self)
             return find_single_index(self._data, self._positions, arr)
-
-    def __hash__(self) -> int:
-        return id(self)
 
     def __setitem__(self, index: Any, data: Any) -> None:
         _logger.debug("RLEArray.__setitem__(...)")
@@ -383,6 +401,9 @@ class RLEArray(ExtensionArray):
             return RLEArray(
                 data=self._data.astype(dtype._dtype), positions=self._positions.copy()
             )
+        if isinstance(dtype, pd.StringDtype):
+            # TODO: fast-path
+            return StringArray._from_sequence([str(x) for x in self])
         return np.array(self, dtype=dtype, copy=copy)
 
     def _get_reduce_data(self, skipna: bool) -> Any:
@@ -790,6 +811,6 @@ class RLEArray(ExtensionArray):
         limit: Optional[int] = None,
     ) -> Any:
         # TODO: fast-path
-        arr = pd.Series(np.asarray(self)).array.fillna(value, method, limit)
+        arr = pd.Series(np.asarray(self)).array.fillna(value, method, limit).to_numpy()
         data, positions = compress(arr)
         return RLEArray(data=data, positions=positions)
