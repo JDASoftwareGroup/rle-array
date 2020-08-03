@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from numpy import testing as npt
 
-from rle_array import RLEArray
+from rle_array.array import RLEArray, _ViewAnchor
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
@@ -117,11 +117,15 @@ def test_anchor_ref() -> None:
         gc.disable()
         gc.collect()
 
-        n_objects_pre = len([o for o in gc.get_objects() if isinstance(o, RLEArray)])
+        n_objects_pre = len(
+            [o for o in gc.get_objects() if isinstance(o, (RLEArray, _ViewAnchor))]
+        )
 
         RLEArray._from_sequence(np.arange(10))
 
-        n_objects_post = len([o for o in gc.get_objects() if isinstance(o, RLEArray)])
+        n_objects_post = len(
+            [o for o in gc.get_objects() if isinstance(o, (RLEArray, _ViewAnchor))]
+        )
         assert n_objects_pre == n_objects_post
     finally:
         gc.enable()
