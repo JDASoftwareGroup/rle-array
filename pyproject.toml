@@ -52,4 +52,4 @@ sphinx = "*"
 
 [tool.pytest.ini_options]
 addopts = "--cov=rle_array --cov-report term-missing --cov-report xml"
-testpath = "tests"
+testpaths = "tests"
