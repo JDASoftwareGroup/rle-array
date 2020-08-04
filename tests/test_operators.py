@@ -250,16 +250,10 @@ def test_unary_operator(
     uncompressed_series: pd.Series,
     unary_operator: FUnaryOperator,
 ) -> None:
-    if unary_operator in (operator.neg, operator.pos):
-        # series implementation seems to cast the rle-array to numpy
-        dtype = float
-    else:
-        dtype = RLEDtype(float)
-
     actual = unary_operator(rle_series)
-    assert actual.dtype == dtype
+    assert actual.dtype == RLEDtype(float)
 
-    expected = unary_operator(uncompressed_series).astype(dtype)
+    expected = unary_operator(uncompressed_series).astype(RLEDtype(float))
     pd.testing.assert_series_equal(actual, expected)
 
 

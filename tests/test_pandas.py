@@ -290,6 +290,15 @@ def use_numpy(request: SubRequest) -> bool:
     return b
 
 
+@pytest.fixture(params=[None, lambda x: x])
+def sort_by_key(request: SubRequest) -> Any:
+    """
+    Simple fixture for testing keys in sorting methods.
+    Tests None (no key) and the identity key.
+    """
+    return request.param
+
+
 class TestArithmeticOps(base.BaseArithmeticOpsTests):
     frame_scalar_exc = None
     series_array_exc = None
@@ -358,8 +367,7 @@ class TestPrinting(base.BasePrintingTests):
 
 
 class TestReshaping(base.BaseReshapingTests):
-    def test_concat_mixed_dtypes(self) -> None:
-        pytest.skip("upstream test is broken?")
+    pass
 
 
 class TestSetitem(base.BaseSetitemTests):

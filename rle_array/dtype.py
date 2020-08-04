@@ -30,6 +30,11 @@ class RLEDtype(ExtensionDtype):
         """
         Strict construction from a string, raise a TypeError if not possible.
         """
+        if not isinstance(string, str):
+            raise TypeError(
+                f"'construct_from_string' expects a string, got {type(string)}"
+            )
+
         prefix = "RLEDtype["
         suffix = "]"
         if not (string.startswith(prefix) and string.endswith(suffix)):
