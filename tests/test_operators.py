@@ -1,5 +1,5 @@
 import operator
-from typing import Any, Callable, cast
+from typing import Any, Callable, Type, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -8,6 +8,7 @@ from _pytest.fixtures import SubRequest
 from numpy import testing as npt
 
 from rle_array import RLEArray, RLEDtype
+from rle_array._operators import rev
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
@@ -91,6 +92,7 @@ def unary_bool_operator(request: SubRequest) -> FUnaryBoolOperator:
     params=[
         operator.add,
         operator.mul,
+        rev(operator.mul),
         operator.sub,
         operator.truediv,
         operator.floordiv,
@@ -199,9 +201,17 @@ def test_binary_operator_uncompressed_series(
     binary_operator: FBinaryOperator,
 ) -> None:
     actual = binary_operator(rle_series, uncompressed_series)
-    assert actual.dtype == float
+    if getattr(binary_operator, "__name__", "???") == "rmul":
+        # pd.Series does not implement __rmul__ correctly
+        expected_dtype: Union[RLEDtype, Type[float]] = RLEDtype(float)
+    else:
+        expected_dtype = float
 
-    expected = binary_operator(uncompressed_series, uncompressed_series)
+    assert actual.dtype == expected_dtype
+
+    expected = binary_operator(uncompressed_series, uncompressed_series).astype(
+        expected_dtype
+    )
     pd.testing.assert_series_equal(actual, expected)
 
 

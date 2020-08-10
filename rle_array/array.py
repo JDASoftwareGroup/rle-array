@@ -31,6 +31,7 @@ from ._algorithms import (
     recompress,
     take,
 )
+from ._operators import rev
 from ._slicing import NormalizedSlice
 from .dtype import RLEDtype
 from .types import POSITIONS_DTYPE
@@ -700,6 +701,9 @@ class RLEArray(ExtensionArray):
 
     def __mul__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.mul)
+
+    def __rmul__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=rev(operator.mul))
 
     def __truediv__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.truediv)
