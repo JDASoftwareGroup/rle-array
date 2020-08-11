@@ -4,10 +4,11 @@ Misc collection of regression tests.
 import pickle
 
 import numpy as np
+import pandas as pd
 import pytest
 from numpy import testing as npt
 
-from rle_array.array import RLEArray
+from rle_array import RLEArray, RLEDtype
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
@@ -53,3 +54,10 @@ def test_inplace_update() -> None:
 
     assert array._dtype._dtype == np.int64
     assert array._data.dtype == np.int64
+
+
+def test_append_mixed() -> None:
+    actual = pd.concat(
+        [pd.Series([1], dtype=np.int8), pd.Series([1], dtype=RLEDtype(np.int8))]
+    )
+    assert actual.dtype == np.int8
