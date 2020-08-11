@@ -6,9 +6,9 @@ import pandas as pd
 import pytest
 from _pytest.fixtures import SubRequest
 from numpy import testing as npt
+from pandas.core import ops
 
 from rle_array import RLEArray, RLEDtype
-from rle_array._operators import rev
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
 
@@ -17,13 +17,6 @@ FUnaryOperator = Callable[[Any], Any]
 FUnaryBoolOperator = Callable[[Any], Any]
 FBinaryOperator = Callable[[Any, Any], Any]
 FBinaryBoolOperator = Callable[[Any, Any], Any]
-
-
-def test_rev() -> None:
-    op = rev(operator.__sub__)
-
-    assert getattr(op, "__name__") == "rsub"
-    assert op(1, 3) == 2
 
 
 @pytest.fixture
@@ -120,20 +113,26 @@ def unary_bool_operator(request: SubRequest) -> FUnaryBoolOperator:
 @pytest.fixture(
     params=[
         operator.add,
-        operator.mul,
-        rev(operator.mul),
-        operator.sub,
-        operator.truediv,
-        operator.floordiv,
-        operator.mod,
-        operator.pow,
         operator.iadd,
+        ops.radd,
+        operator.sub,
         operator.isub,
+        ops.rsub,
+        operator.mul,
         operator.imul,
+        ops.rmul,
+        operator.truediv,
         operator.itruediv,
+        ops.rtruediv,
+        operator.floordiv,
         operator.ifloordiv,
-        operator.ipow,
+        ops.rfloordiv,
+        operator.mod,
         operator.imod,
+        ops.rmod,
+        operator.pow,
+        operator.ipow,
+        ops.rpow,
     ],
     ids=lambda op: str(op.__name__),
 )
@@ -144,11 +143,14 @@ def binary_operator(request: SubRequest) -> FBinaryOperator:
 @pytest.fixture(
     params=[
         operator.and_,
-        operator.or_,
         operator.iand,
+        ops.rand_,
+        operator.or_,
         operator.ior,
+        ops.ror_,
         operator.xor,
         operator.ixor,
+        ops.rxor,
     ],
     ids=lambda op: str(op.__name__),
 )
@@ -233,8 +235,16 @@ def test_binary_operator_uncompressed_series(
     binary_operator: FBinaryOperator,
 ) -> None:
     actual = binary_operator(rle_series, uncompressed_series2)
-    if getattr(binary_operator, "__name__", "???") == "rmul":
-        # pd.Series does not implement __rmul__ correctly
+    if getattr(binary_operator, "__name__", "???") in (
+        "radd",
+        "rfloordiv",
+        "rmod",
+        "rmul",
+        "rpow",
+        "rsub",
+        "rtruediv",
+    ):
+        # pd.Series does not implement these operations correctly
         expected_dtype: Union[RLEDtype, Type[float]] = RLEDtype(float)
     else:
         expected_dtype = float
@@ -285,9 +295,16 @@ def test_binary_bool_operator_uncompressed_series(
     binary_bool_operator: FBinaryBoolOperator,
 ) -> None:
     actual = binary_bool_operator(rle_bool_series, uncompressed_bool_series2)
-    assert actual.dtype == bool
+    if getattr(binary_bool_operator, "__name__", "???") in ("rand_", "ror_", "rxor"):
+        # pd.Series does not implement these operations correctly
+        expected_dtype: Union[RLEDtype, Type[bool]] = RLEDtype(bool)
+    else:
+        expected_dtype = bool
+    assert actual.dtype == expected_dtype
 
-    expected = binary_bool_operator(uncompressed_bool_series, uncompressed_bool_series2)
+    expected = binary_bool_operator(
+        uncompressed_bool_series, uncompressed_bool_series2
+    ).astype(expected_dtype)
     pd.testing.assert_series_equal(actual, expected)
 
 

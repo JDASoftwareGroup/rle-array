@@ -32,7 +32,6 @@ from ._algorithms import (
     recompress,
     take,
 )
-from ._operators import rev
 from ._slicing import NormalizedSlice
 from .dtype import RLEDtype
 from .types import POSITIONS_DTYPE
@@ -726,32 +725,56 @@ class RLEArray(ExtensionArray):
     def __sub__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.sub)
 
+    def __rsub__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rsub)
+
     def __mul__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.mul)
 
     def __rmul__(self, other: Any) -> Union["RLEArray", np.ndarray]:
-        return self._apply_binary_operator(other, op=rev(operator.mul))
+        return self._apply_binary_operator(other, op=ops.rmul)
 
     def __truediv__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.truediv)
 
+    def __rtruediv__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rtruediv)
+
     def __floordiv__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.floordiv)
+
+    def __rfloordiv__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rfloordiv)
 
     def __mod__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.mod)
 
+    def __rmod__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rmod)
+
     def __pow__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.pow)
+
+    def __rpow__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rpow)
 
     def __and__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.and_)
 
+    def __rand__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rand_)
+
     def __or__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.or_)
 
+    def __ror__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.ror_)
+
     def __xor__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.xor)
+
+    def __rxor__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rxor)
 
     def __pos__(self) -> "RLEArray":
         return self._apply_unary_operator(op=operator.pos)
