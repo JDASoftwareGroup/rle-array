@@ -653,7 +653,7 @@ class RLEArray(ExtensionArray):
 
     def __array_ufunc__(
         self, ufunc: Callable[..., Any], method: str, *inputs: Any, **kwargs: Any
-    ) -> Any:
+    ) -> Union[None, "RLEArray", np.ndarray]:
         _logger.debug("RLEArray.__array_ufunc__(...)")
         out = kwargs.get("out", ())
         for x in inputs + out:
@@ -676,9 +676,17 @@ class RLEArray(ExtensionArray):
                 if isinstance(x, RLEArray):
                     x[:] = y
 
+        def maybe_from_sequence(x: np.ndarray) -> Union[RLEArray, np.ndarray]:
+            if x.ndim == 1:
+                # suitable for RLE compression
+                return type(self)._from_sequence(x)
+            else:
+                # likely a broadcast operation
+                return x
+
         if type(result) is tuple:
             # multiple return values
-            return tuple(type(self)._from_sequence(x) for x in result)
+            return tuple(maybe_from_sequence(x) for x in result)
         elif method == "at":
             assert result is None
 
@@ -689,7 +697,7 @@ class RLEArray(ExtensionArray):
             return None
         else:
             # one return value
-            return type(self)._from_sequence(result)
+            return maybe_from_sequence(result)
 
     def __eq__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.eq)
