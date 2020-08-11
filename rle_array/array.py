@@ -857,8 +857,13 @@ class RLEArray(ExtensionArray):
         value: Any = None,
         method: Optional[str] = None,
         limit: Optional[int] = None,
-    ) -> Any:
+    ) -> "RLEArray":
         # TODO: fast-path
         arr = pd.Series(np.asarray(self)).array.fillna(value, method, limit).to_numpy()
         data, positions = compress(arr)
         return RLEArray(data=data, positions=positions)
+
+    def round(self, decimals: int = 0) -> "RLEArray":
+        _logger.debug("RLEArray.round(decimals=%r)", decimals)
+        new_data = self._data.round(decimals)
+        return RLEArray(*recompress(new_data, self._positions))
