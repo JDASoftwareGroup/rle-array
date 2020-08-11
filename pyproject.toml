@@ -48,7 +48,6 @@ isort = "5.0.9"
 mypy = "*"
 pytest = ">=6"
 pytest-cov = "*"
-setuptools_scm = "*"
 sphinx = "*"
 
 [tool.pytest.ini_options]
