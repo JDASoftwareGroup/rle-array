@@ -2,7 +2,8 @@ import logging
 import operator
 import warnings
 from collections import namedtuple
-from typing import Any, Callable, Iterator, Optional, Sequence, Union
+from copy import copy
+from typing import Any, Callable, Dict, Iterator, Optional, Sequence, Union
 from weakref import WeakSet, ref
 
 import numpy as np
@@ -224,8 +225,26 @@ class RLEArray(ExtensionArray):
         self._dtype = RLEDtype(data.dtype)
         self._data = data
         self._positions = positions
+        self._setup_view_system()
+
+    def _setup_view_system(self) -> None:
+        """
+        Setup any view-related tracking parts.
+
+        Must be called after initialization or unpickling.
+        """
         self._view_anchor = _ViewAnchor(self)
         self._projection = _ViewMaster.register_first(self)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = copy(self.__dict__)
+        del state["_view_anchor"]
+        del state["_projection"]
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+        self._setup_view_system()
 
     @property
     def _lengths(self) -> Any:
