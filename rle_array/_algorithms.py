@@ -40,7 +40,13 @@ def compress(scalars: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         Data at start of reach run.
     positions:
         End positions of runs.
+
+    Raises
+    ------
+    ValueError: If non-1-dimensional arrays are compressed.
     """
+    if scalars.ndim != 1:
+        raise ValueError("Only 1-dimensional arrays can be compressed.")
     if len(scalars) == 0:
         return (scalars, np.array([], dtype=POSITIONS_DTYPE))
 

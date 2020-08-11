@@ -132,10 +132,20 @@ def test_calc_lengths(positions: np.ndarray, expected: np.ndarray) -> None:
         ),
     ],
 )
-def test_compress(scalars: np.ndarray, data: np.ndarray, positions: np.ndarray) -> None:
+def test_compress_ok(
+    scalars: np.ndarray, data: np.ndarray, positions: np.ndarray
+) -> None:
     data_actual, positions_actual = compress(scalars)
     npt.assert_array_equal(data_actual, data)
     npt.assert_array_equal(positions_actual, positions)
+
+
+def test_compress_fail_non_1d() -> None:
+    scalars = np.array([[1, 2], [3, 4]])
+    with pytest.raises(
+        ValueError, match="Only 1-dimensional arrays can be compressed."
+    ):
+        compress(scalars)
 
 
 @pytest.mark.parametrize(
