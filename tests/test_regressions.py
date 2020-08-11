@@ -42,3 +42,14 @@ def test_pickle() -> None:
     array_orig = array.copy()
     array2[:] = 3
     npt.assert_array_equal(array, array_orig)
+
+
+def test_inplace_update() -> None:
+    array = RLEArray._from_sequence([1], dtype=np.int64)
+    array[[True]] = 2
+
+    expected = np.array([2], dtype=np.int64)
+    npt.assert_array_equal(array, expected)
+
+    assert array._dtype._dtype == np.int64
+    assert array._data.dtype == np.int64

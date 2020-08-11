@@ -117,7 +117,9 @@ def decompress(
         Scalars, decompressed.
     """
     lengths = calc_lengths(positions)
-    return np.repeat(data.astype(dtype), lengths)
+    if dtype is not None:
+        data = data.astype(dtype)
+    return np.repeat(data, lengths)
 
 
 def detect_changes(scalars: np.ndarray) -> np.ndarray:

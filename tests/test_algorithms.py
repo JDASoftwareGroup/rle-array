@@ -291,6 +291,7 @@ def test_decompress(
 ) -> None:
     scalars_actual = decompress(data, positions, dtype)
     npt.assert_array_equal(scalars_actual, scalars)
+    assert scalars_actual.dtype == scalars.dtype
 
 
 @pytest.mark.parametrize(
