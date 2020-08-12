@@ -12,6 +12,7 @@ from pandas.api.extensions import ExtensionArray
 from pandas.arrays import BooleanArray, IntegerArray, StringArray
 from pandas.core import ops
 from pandas.core.algorithms import unique
+from pandas.core.arrays.boolean import coerce_to_array as coerce_to_boolean_array
 from pandas.core.dtypes.common import is_array_like
 from pandas.core.dtypes.generic import ABCIndexClass, ABCSeries
 from pandas.core.dtypes.inference import is_scalar
@@ -263,7 +264,20 @@ class RLEArray(ExtensionArray):
         if isinstance(dtype, RLEDtype):
             dtype = dtype._dtype
 
-        scalars = np.asarray(scalars, dtype=dtype)
+        if isinstance(scalars, np.ndarray):
+            if (dtype is not None) and (dtype != scalars.dtype):
+                # some cast required
+                if dtype == np.bool_:
+                    # bool case
+                    scalars, mask = coerce_to_boolean_array(scalars)
+                    if mask.any():
+                        raise TypeError("Masked booleans are not supported")
+                else:
+                    # catch-them-all case
+                    # TODO: get rid of this unsafe cast
+                    scalars = scalars.astype(dtype)
+        else:
+            scalars = np.asarray(scalars, dtype=dtype)
         data, positions = compress(scalars)
         return RLEArray(data=data, positions=positions)
 

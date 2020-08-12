@@ -71,3 +71,45 @@ def test_bool_ensure_int_or_float() -> None:
     expected = np.array([0, 1], dtype=np.int64)
     assert actual.dtype == expected.dtype
     npt.assert_array_equal(actual, expected)
+
+
+def test_groupby_bool_first() -> None:
+    df = pd.DataFrame({"x": pd.Series([True, True], dtype=RLEDtype(bool)), "g": 1})
+    series = df.groupby("g")["x"].first()
+    assert series.dtype == RLEDtype(bool)
+
+    expected = RLEArray._from_sequence([True])
+    npt.assert_array_equal(series.array, expected)
+
+
+def test_from_sequence_bool() -> None:
+    array = RLEArray._from_sequence(
+        np.array([0, 1], dtype=np.int64), dtype=RLEDtype(bool)
+    )
+    npt.assert_array_equal(array, np.array([False, True]))
+
+    array = RLEArray._from_sequence(
+        np.array([0.0, 1.0], dtype=np.float64), dtype=RLEDtype(bool)
+    )
+    npt.assert_array_equal(array, np.array([False, True]))
+
+    with pytest.raises(TypeError, match="Need to pass bool-like values"):
+        RLEArray._from_sequence(np.array([1, 2], dtype=np.int64), dtype=RLEDtype(bool))
+
+    with pytest.raises(TypeError, match="Need to pass bool-like values"):
+        RLEArray._from_sequence(np.array([-1, 1], dtype=np.int64), dtype=RLEDtype(bool))
+
+    with pytest.raises(TypeError, match="Masked booleans are not supported"):
+        RLEArray._from_sequence(
+            np.array([np.nan, 1.0], dtype=np.float64), dtype=RLEDtype(bool)
+        )
+
+
+def test_groupby_bool_sum() -> None:
+    # Cython routines for integer addition are not available, so we need to accept floats here.
+    df = pd.DataFrame({"x": pd.Series([True, True], dtype=RLEDtype(bool)), "g": 1})
+    series = df.groupby("g")["x"].sum()
+    assert series.dtype == np.float64
+
+    expected = np.array([2], dtype=np.float64)
+    npt.assert_array_equal(series.to_numpy(), expected)
