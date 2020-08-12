@@ -2,6 +2,7 @@ import warnings
 from contextlib import contextmanager
 from typing import Generator
 
+import numpy as np
 import pandas as pd
 from pandas.errors import PerformanceWarning
 
@@ -27,6 +28,12 @@ class Base:
         with warnings.catch_warnings():
             warnings.simplefilter(action="ignore", category=PerformanceWarning)
             yield
+
+
+class TimeCompression(Base):
+    def time_decompress(self) -> None:
+        with self.ignore_performance_warnings():
+            self.df_rle[const_col([1, 2])].array.astype(np.int64)
 
 
 class TimeTake(Base):

@@ -96,6 +96,21 @@ def concat(
     return (data, positions)
 
 
+@numba.jit(nopython=True, cache=True, nogil=True)
+def _inplace_repeat(
+    data: np.ndarray, lenghts: np.ndarray, out: np.ndarray
+) -> np.ndarray:
+    assert len(data) == len(lenghts)
+    pos = 0
+    for i in range(len(data)):
+        d = data[i]
+        run_lengths = lenghts[i]
+        pos_next = pos + run_lengths
+        out[pos:pos_next] = d
+        pos = pos_next
+    return
+
+
 def decompress(
     data: np.ndarray, positions: np.ndarray, dtype: Optional[Any] = None
 ) -> np.ndarray:
@@ -116,10 +131,22 @@ def decompress(
     scalars:
         Scalars, decompressed.
     """
+    target_dtype = dtype if dtype is not None else data.dtype
+    if len(data) == 0:
+        return np.empty(0, dtype=target_dtype)
+
     lengths = calc_lengths(positions)
     if dtype is not None:
-        data = data.astype(dtype)
-    return np.repeat(data, lengths)
+        data = data.astype(target_dtype, copy=False)
+
+    if (target_dtype != np.dtype(object)) and not np.issubdtype(
+        target_dtype, np.flexible
+    ):
+        out = np.empty(positions[-1], dtype=target_dtype)
+        _inplace_repeat(data, lengths, out)
+        return out
+    else:
+        return np.repeat(data, lengths)
 
 
 def detect_changes(scalars: np.ndarray) -> np.ndarray:
