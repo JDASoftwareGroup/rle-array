@@ -407,18 +407,23 @@ class RLEArray(ExtensionArray):
 
         return decompress(self._data, self._positions, dtype)
 
-    def astype(self, dtype: Any, copy: bool = True) -> Any:
+    def astype(self, dtype: Any, copy: bool = True, casting: str = "unsafe") -> Any:
         _logger.debug("RLEArray.astype(dtype=%r, copy=%r)", dtype, copy)
         if isinstance(dtype, RLEDtype):
             if (not copy) and (dtype == self.dtype):
                 return self
             return RLEArray(
-                data=self._data.astype(dtype._dtype), positions=self._positions.copy()
+                data=self._data.astype(dtype._dtype, casting=casting),
+                positions=self._positions.copy(),
             )
         if isinstance(dtype, pd.StringDtype):
             # TODO: fast-path
             return StringArray._from_sequence([str(x) for x in self])
-        return np.array(self, dtype=dtype, copy=copy)
+
+        if casting != "unsafe":
+            return np.array(self, copy=copy).astype(dtype=dtype, casting=casting)
+        else:
+            return np.array(self, dtype=dtype, copy=copy)
 
     def _get_reduce_data(self, skipna: bool) -> Any:
         data = self._data

@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from numpy import testing as npt
+from pandas.core.dtypes.common import ensure_int_or_float
 
 from rle_array import RLEArray, RLEDtype
 
@@ -61,3 +62,12 @@ def test_append_mixed() -> None:
         [pd.Series([1], dtype=np.int8), pd.Series([1], dtype=RLEDtype(np.int8))]
     )
     assert actual.dtype == np.int8
+
+
+def test_bool_ensure_int_or_float() -> None:
+    array = RLEArray._from_sequence([False, True], dtype=np.bool_)
+    actual = ensure_int_or_float(array)
+
+    expected = np.array([0, 1], dtype=np.int64)
+    assert actual.dtype == expected.dtype
+    npt.assert_array_equal(actual, expected)
