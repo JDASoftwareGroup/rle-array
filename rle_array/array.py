@@ -11,6 +11,7 @@ import pandas as pd
 from pandas.api.extensions import ExtensionArray
 from pandas.arrays import BooleanArray, IntegerArray, StringArray
 from pandas.core import ops
+from pandas.core.algorithms import unique
 from pandas.core.dtypes.common import is_array_like
 from pandas.core.dtypes.generic import ABCIndexClass, ABCSeries
 from pandas.core.dtypes.inference import is_scalar
@@ -867,3 +868,10 @@ class RLEArray(ExtensionArray):
         _logger.debug("RLEArray.round(decimals=%r)", decimals)
         new_data = self._data.round(decimals)
         return RLEArray(*recompress(new_data, self._positions))
+
+    def unique(self) -> "RLEArray":
+        uniques = unique(self._data)
+        return RLEArray(
+            data=uniques,
+            positions=np.arange(1, 1 + len(uniques), dtype=POSITIONS_DTYPE),
+        )

@@ -98,6 +98,14 @@ class TimeShift(Base):
         self.df_rle[const_col([1, 2])].shift(periods=1)
 
 
+class TimeUnique(Base):
+    def time_const12_base(self) -> None:
+        self.df_baseline[const_col([1, 2])].unique()
+
+    def time_const12_rle(self) -> None:
+        self.df_rle[const_col([1, 2])].unique()
+
+
 class TimeOperator(Base):
     def time_add_const12_baseline(self) -> None:
         self.df_baseline[const_col([1, 2])] + self.df_baseline[const_col([1, 2])]
