@@ -3,7 +3,7 @@ import operator
 import warnings
 from collections import namedtuple
 from copy import copy
-from typing import Any, Callable, Dict, Iterator, Optional, Sequence, Union
+from typing import Any, Callable, Dict, Iterator, Optional, Sequence, Tuple, Union
 from weakref import WeakSet, ref
 
 import numpy as np
@@ -11,7 +11,7 @@ import pandas as pd
 from pandas.api.extensions import ExtensionArray
 from pandas.arrays import BooleanArray, IntegerArray, StringArray
 from pandas.core import ops
-from pandas.core.algorithms import unique
+from pandas.core.algorithms import factorize, unique
 from pandas.core.arrays.boolean import coerce_to_array as coerce_to_boolean_array
 from pandas.core.dtypes.common import is_array_like
 from pandas.core.dtypes.generic import ABCIndexClass, ABCSeries
@@ -285,6 +285,25 @@ class RLEArray(ExtensionArray):
     def _from_factorized(cls, data: Any, original: "RLEArray") -> "RLEArray":
         _logger.debug("RLEArray._from_factorized(...)")
         return cls._from_sequence(np.asarray(data, dtype=original.dtype._dtype))
+
+    def _values_for_factorize(self) -> Tuple[np.ndarray, Any]:
+        # decompressing version of `_values_for_factorize` which is not only required for `factorize` but also for other
+        # things like `pandas.core.util.hashing.hash_array`
+        return decompress(self._data, self._positions), self.dtype.na_value
+
+    def factorize(self, na_sentinel: int = -1) -> Tuple[np.ndarray, "RLEArray"]:
+        # optimized version of `ExtensionArray.factorize`:
+        #   1. replace `_values_for_factorize` with a version that does not decompress the data
+        #   2. passing compressed data to `factorize` (instead of `_factorize_array` because that does not handle NA
+        #      values nicely)
+        #   3. decompress `codes`
+        arr = self._data
+
+        codes, uniques = factorize(arr, na_sentinel=na_sentinel)
+
+        uniques = self._from_factorized(uniques, self)
+        codes = decompress(codes, self._positions)
+        return codes, uniques
 
     def __getitem__(self, arr: Any) -> Any:
         _logger.debug("RLEArray.__getitem__(arr=%s(...))", type(arr).__name__)

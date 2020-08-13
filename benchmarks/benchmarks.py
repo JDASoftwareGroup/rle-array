@@ -134,3 +134,12 @@ class TimeOperator(Base):
 class TimeGenerateTestDataFrame(Base):
     def time(self) -> None:
         self.gen_baseline()
+
+
+class TimeFactorize(Base):
+    def time_const12_base(self) -> None:
+        self.df_baseline[const_col([1, 2])].factorize()
+
+    def time_const12_rle(self) -> None:
+        with self.ignore_performance_warnings():
+            self.df_rle[const_col([1, 2])].factorize()

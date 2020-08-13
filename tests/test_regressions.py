@@ -113,3 +113,16 @@ def test_groupby_bool_sum() -> None:
 
     expected = np.array([2], dtype=np.float64)
     npt.assert_array_equal(series.to_numpy(), expected)
+
+
+def test_factorize_int() -> None:
+    array = RLEArray._from_sequence([42, -10, -10], dtype=RLEDtype(np.int32))
+    codes_actual, uniques_actual = array.factorize()
+
+    codes_expected = np.array([0, 1, 1], dtype=np.int64)
+    assert codes_actual.dtype == codes_expected.dtype
+    npt.assert_array_equal(codes_actual, codes_expected)
+
+    uniques_expected = RLEArray._from_sequence([42, -10], dtype=np.int32)
+    assert uniques_actual.dtype == uniques_expected.dtype
+    npt.assert_array_equal(uniques_actual, uniques_expected)
