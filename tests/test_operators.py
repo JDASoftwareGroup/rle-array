@@ -1,5 +1,5 @@
 import operator
-from typing import Any, Callable, Type, Union, cast
+from typing import Any, Callable, cast
 
 import numpy as np
 import pandas as pd
@@ -235,25 +235,9 @@ def test_binary_operator_uncompressed_series(
     binary_operator: FBinaryOperator,
 ) -> None:
     actual = binary_operator(rle_series, uncompressed_series2)
-    if getattr(binary_operator, "__name__", "???") in (
-        "radd",
-        "rfloordiv",
-        "rmod",
-        "rmul",
-        "rpow",
-        "rsub",
-        "rtruediv",
-    ):
-        # pd.Series does not implement these operations correctly
-        expected_dtype: Union[RLEDtype, Type[float]] = RLEDtype(float)
-    else:
-        expected_dtype = float
+    assert actual.dtype == float
 
-    assert actual.dtype == expected_dtype
-
-    expected = binary_operator(uncompressed_series, uncompressed_series2).astype(
-        expected_dtype
-    )
+    expected = binary_operator(uncompressed_series, uncompressed_series2)
     pd.testing.assert_series_equal(actual, expected)
 
 
@@ -295,16 +279,9 @@ def test_binary_bool_operator_uncompressed_series(
     binary_bool_operator: FBinaryBoolOperator,
 ) -> None:
     actual = binary_bool_operator(rle_bool_series, uncompressed_bool_series2)
-    if getattr(binary_bool_operator, "__name__", "???") in ("rand_", "ror_", "rxor"):
-        # pd.Series does not implement these operations correctly
-        expected_dtype: Union[RLEDtype, Type[bool]] = RLEDtype(bool)
-    else:
-        expected_dtype = bool
-    assert actual.dtype == expected_dtype
+    assert actual.dtype == bool
 
-    expected = binary_bool_operator(
-        uncompressed_bool_series, uncompressed_bool_series2
-    ).astype(expected_dtype)
+    expected = binary_bool_operator(uncompressed_bool_series, uncompressed_bool_series2)
     pd.testing.assert_series_equal(actual, expected)
 
 

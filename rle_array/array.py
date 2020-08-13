@@ -705,7 +705,9 @@ class RLEArray(ExtensionArray):
                 return NotImplemented
 
         # Defer to the implementation of the ufunc on unwrapped values.
+        inputs_has_ndarray = any(isinstance(x, np.ndarray) for x in inputs)
         inputs = tuple(np.asarray(x) if isinstance(x, RLEArray) else x for x in inputs)
+
         if out:
             kwargs["out"] = tuple(
                 np.asarray(x) if isinstance(x, RLEArray) else x for x in out
@@ -717,7 +719,7 @@ class RLEArray(ExtensionArray):
                     x[:] = y
 
         def maybe_from_sequence(x: np.ndarray) -> Union[RLEArray, np.ndarray]:
-            if x.ndim == 1:
+            if (x.ndim == 1) and (not inputs_has_ndarray):
                 # suitable for RLE compression
                 return type(self)._from_sequence(x)
             else:
