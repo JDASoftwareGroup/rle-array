@@ -102,9 +102,7 @@ def _inplace_repeat(
 ) -> np.ndarray:
     n = len(positions)
     assert len(data) == n
-
-    if n == 0:
-        return
+    assert n > 0
 
     out[0 : positions[0]] = data[0]
 

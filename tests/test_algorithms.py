@@ -286,6 +286,26 @@ def test_concat(
             # scalars
             np.array([2, np.nan, np.nan, 3, 3, 3], dtype=np.float64),
         ),
+        (
+            # dtype
+            np.array([1], dtype=np.int8),
+            # positions
+            np.array([2], dtype=POSITIONS_DTYPE),
+            # dtype
+            None,
+            # scalars
+            np.array([1, 1], dtype=np.int8),
+        ),
+        (
+            # dtype
+            np.array(["a", None, "b"], dtype=np.object_),
+            # positions
+            np.array([1, 3, 6], dtype=POSITIONS_DTYPE),
+            # dtype
+            None,
+            # scalars
+            np.array(["a", None, None, "b", "b", "b"], dtype=np.object_),
+        ),
     ],
 )
 def test_decompress(
