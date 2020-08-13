@@ -297,9 +297,6 @@ class RLEArray(ExtensionArray):
             )
 
         if is_array_like(arr) or isinstance(arr, list):
-            warnings.warn(
-                "performance: __getitem__ with list is slow", PerformanceWarning
-            )
             arr = _normalize_arraylike_indexing(arr, len(self))
 
             if arr.dtype == np.bool_:
@@ -307,14 +304,19 @@ class RLEArray(ExtensionArray):
             else:
                 arr = arr.astype(int)
 
+            if len(arr) == 0:
+                return RLEArray(data=self._data[[]], positions=self._positions[[]])
+
             arr[arr < 0] += len(self)
 
-            result = np.asarray(
-                [find_single_index(self._data, self._positions, i) for i in arr],
-                dtype=self.dtype._dtype,
+            data, positions = take(
+                data=self._data,
+                positions=self._positions,
+                indices=arr,
+                allow_fill=False,
+                fill_value=self.dtype.na_value,
             )
-
-            return self._from_sequence(result)
+            return RLEArray(data=data, positions=positions)
         elif isinstance(arr, slice):
             data, positions = find_slice(self._data, self._positions, arr)
             parent_normalized = NormalizedSlice.from_slice(
