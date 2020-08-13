@@ -31,9 +31,13 @@ class Base:
 
 
 class TimeCompression(Base):
-    def time_decompress(self) -> None:
+    def time_decompress_array_astype(self) -> None:
         with self.ignore_performance_warnings():
             self.df_rle[const_col([1, 2])].array.astype(np.int64)
+
+    def time_decompress_to_numpy(self) -> None:
+        with self.ignore_performance_warnings():
+            self.df_rle[const_col([1, 2])].to_numpy()
 
 
 class TimeTake(Base):

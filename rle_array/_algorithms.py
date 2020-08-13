@@ -98,16 +98,21 @@ def concat(
 
 @numba.jit(nopython=True, cache=True, nogil=True)
 def _inplace_repeat(
-    data: np.ndarray, lenghts: np.ndarray, out: np.ndarray
+    data: np.ndarray, positions: np.ndarray, out: np.ndarray
 ) -> np.ndarray:
-    assert len(data) == len(lenghts)
-    pos = 0
-    for i in range(len(data)):
-        d = data[i]
-        run_lengths = lenghts[i]
-        pos_next = pos + run_lengths
-        out[pos:pos_next] = d
-        pos = pos_next
+    n = len(positions)
+    assert len(data) == n
+
+    if n == 0:
+        return
+
+    out[0 : positions[0]] = data[0]
+
+    if n == 1:
+        return
+
+    for i in range(1, n):
+        out[positions[i - 1] : positions[i]] = data[i]
     return
 
 
@@ -135,7 +140,6 @@ def decompress(
     if len(data) == 0:
         return np.empty(0, dtype=target_dtype)
 
-    lengths = calc_lengths(positions)
     if dtype is not None:
         data = data.astype(target_dtype, copy=False)
 
@@ -143,9 +147,10 @@ def decompress(
         target_dtype, np.flexible
     ):
         out = np.empty(positions[-1], dtype=target_dtype)
-        _inplace_repeat(data, lengths, out)
+        _inplace_repeat(data, positions, out)
         return out
     else:
+        lengths = calc_lengths(positions)
         return np.repeat(data, lengths)
 
 
