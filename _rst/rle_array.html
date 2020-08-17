@@ -80,8 +80,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dtype</strong> (<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference internal" href="rle_array.dtype.html#module-rle_array.dtype" title="rle_array.dtype"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>) – Typecode or data-type to which the array is cast.</p></li>
-<li><p><strong>copy</strong> (<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="#" title=""><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>) – Whether to copy the data, even if not necessary. If False,
+<li><p><strong>dtype</strong> (<a class="reference external" href="#" title=""><em>str</em></a><em> or </em><a class="reference external" href="#" title=""><em>dtype</em></a>) – Typecode or data-type to which the array is cast.</p></li>
+<li><p><strong>copy</strong> (<a class="reference external" href="#" title=""><em>bool</em></a><em>, </em><a class="reference external" href="#" title=""><em>default True</em></a>) – Whether to copy the data, even if not necessary. If False,
 a copy is made only if the old dtype does not match the
 new dtype.</p></li>
 </ul>
@@ -90,7 +90,7 @@ new dtype.</p></li>
 <dd class="field-even"><p><strong>array</strong> – NumPy ndarray with ‘dtype’ for its dtype.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="#" title="">ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -118,7 +118,7 @@ new dtype.</p></li>
 <dd class="field-odd"><p><strong>valid</strong></p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionArray</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="#" title="">ExtensionArray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -136,13 +136,13 @@ new dtype.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>value</strong> (<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">scalar</span></code></a>, <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">array-like</span></code></a>) – If a scalar value is passed it is used to fill all missing values.
+<li><p><strong>value</strong> (<a class="reference external" href="#" title=""><em>scalar</em></a><em>, </em><a class="reference external" href="#" title=""><em>array-like</em></a>) – If a scalar value is passed it is used to fill all missing values.
 Alternatively, an array-like ‘value’ can be given. It’s expected
 that the array-like have the same length as ‘self’.</p></li>
-<li><p><strong>method</strong> (<code class="docutils literal notranslate"><span class="pre">{'backfill',</span> <span class="pre">'bfill',</span> <span class="pre">'pad',</span> <span class="pre">'ffill',</span> <span class="pre">None}</span></code>, <em>default</em> <a class="reference external" href="#" title=""><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>) – Method to use for filling holes in reindexed Series
+<li><p><strong>method</strong> (<a class="reference external" href="#" title=""><em>{'backfill'</em></a><em>, </em><a class="reference external" href="#" title=""><em>'bfill'</em></a><em>, </em><a class="reference external" href="#" title=""><em>'pad'</em></a><em>, </em><a class="reference external" href="#" title=""><em>'ffill'</em></a><em>, </em><a class="reference external" href="#" title=""><em>None}</em></a><em>, </em><a class="reference external" href="#" title=""><em>default None</em></a>) – Method to use for filling holes in reindexed Series
 pad / ffill: propagate last valid observation forward to next valid
 backfill / bfill: use NEXT valid observation to fill gap.</p></li>
-<li><p><strong>limit</strong> (<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>default</em> <a class="reference external" href="#" title=""><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>) – If method is specified, this is the maximum number of consecutive
+<li><p><strong>limit</strong> (<a class="reference external" href="#" title=""><em>int</em></a><em>, </em><a class="reference external" href="#" title=""><em>default None</em></a>) – If method is specified, this is the maximum number of consecutive
 NaN values to forward/backward fill. In other words, if there is
 a gap with more than this number of consecutive NaNs, it will only
 be partially filled. If method is not specified, this is the
@@ -171,7 +171,7 @@ an ndarray would be expensive, an ExtensionArray may be
 returned.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">Union[np.ndarray</span></code></a>, <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionArray]</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="#" title="">Union</a>[<a class="reference external" href="#" title="">np.ndarray</a>, <a class="reference external" href="#" title="">ExtensionArray</a>]</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -231,9 +231,9 @@ returned.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>periods</strong> (<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">1</span></code>) – The number of periods to shift. Negative values are allowed
+<li><p><strong>periods</strong> (<a class="reference external" href="#" title=""><em>int</em></a><em>, </em><a class="reference external" href="#" title=""><em>default 1</em></a>) – The number of periods to shift. Negative values are allowed
 for shifting backwards.</p></li>
-<li><p><strong>fill_value</strong> (<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>, <em>optional</em>) – <p>The scalar value to use for newly introduced missing values.
+<li><p><strong>fill_value</strong> (<a class="reference external" href="#" title=""><em>object</em></a><em>, </em><a class="reference external" href="#" title=""><em>optional</em></a>) – <p>The scalar value to use for newly introduced missing values.
 The default is <code class="docutils literal notranslate"><span class="pre">self.dtype.na_value</span></code>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.24.0.</span></p>
@@ -278,8 +278,8 @@ len(self) is returned, with all values filled with
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>indices</strong> (<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">sequence</span></code></a> of <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Indices to be taken.</p></li>
-<li><p><strong>allow_fill</strong> (<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="#" title=""><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – <p>How to handle negative values in <cite>indices</cite>.</p>
+<li><p><strong>indices</strong> (<a class="reference external" href="#" title=""><em>sequence of int</em></a>) – Indices to be taken.</p></li>
+<li><p><strong>allow_fill</strong> (<a class="reference external" href="#" title=""><em>bool</em></a><em>, </em><a class="reference external" href="#" title=""><em>default False</em></a>) – <p>How to handle negative values in <cite>indices</cite>.</p>
 <ul>
 <li><p>False: negative values in <cite>indices</cite> indicate positional indices
 from the right (the default). This is similar to
@@ -289,7 +289,7 @@ missing values. These values are set to <cite>fill_value</cite>. Any other
 other negative values raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p></li>
 </ul>
 </p></li>
-<li><p><strong>fill_value</strong> (<a class="reference internal" href="#rle_array.RLEArray.any" title="rle_array.RLEArray.any"><code class="xref py py-class docutils literal notranslate"><span class="pre">any</span></code></a>, <em>optional</em>) – <p>Fill value to use for NA-indices when <cite>allow_fill</cite> is True.
+<li><p><strong>fill_value</strong> (<a class="reference external" href="#" title=""><em>any</em></a><em>, </em><a class="reference external" href="#" title=""><em>optional</em></a>) – <p>Fill value to use for NA-indices when <cite>allow_fill</cite> is True.
 This may be <code class="docutils literal notranslate"><span class="pre">None</span></code>, in which case the default NA value for
 the type, <code class="docutils literal notranslate"><span class="pre">self.dtype.na_value</span></code>, is used.</p>
 <p>For many ExtensionArrays, there will be two representations of
@@ -364,7 +364,7 @@ extension array to object dtype. This uses the helper method
 <dd><p>Return a view on the array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dtype</strong> (<a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">np.dtype</span></code></a>, or <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionDtype</span></code></a>, <em>optional</em>) – Default None.</p>
+<dd class="field-odd"><p><strong>dtype</strong> (<a class="reference external" href="#" title=""><em>str</em></a><em>, </em><a class="reference external" href="#" title=""><em>np.dtype</em></a><em>, or </em><a class="reference external" href="#" title=""><em>ExtensionDtype</em></a><em>, </em><a class="reference external" href="#" title=""><em>optional</em></a>) – Default None.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A view on the <a class="reference external" href="#" title=""><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionArray</span></code></a>’s data.</p>
@@ -529,7 +529,7 @@ not compress at all).</p></li>
       &copy;2019-2020, Blue Yonder Group, Inc.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
