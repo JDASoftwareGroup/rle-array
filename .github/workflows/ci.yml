@@ -58,21 +58,19 @@ jobs:
           name: docs
           path: docs/_build/html
       - name: Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v1.0.12
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          # NOTE: `token` is not required, because the rle-array repo is public
           file: ./coverage.xml
           name: pytest-${{ runner.OS }}-${{ matrix.python }}
       - name: Publish to PyPI
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') && matrix.python == '3.7'
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
+        run: poetry publish
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
       - name: Deploy Docs
         if: github.event_name == 'push' && github.event.ref == 'refs/heads/master' && matrix.python == '3.7'
         uses: peaceiris/actions-gh-pages@v3
         with:
-          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/_build/html
