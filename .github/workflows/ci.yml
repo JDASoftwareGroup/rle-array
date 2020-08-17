@@ -65,10 +65,9 @@ jobs:
           name: pytest-${{ runner.OS }}-${{ matrix.python }}
       - name: Publish to PyPI
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') && matrix.python == '3.7'
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
+        run: poetry publish
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
       - name: Deploy Docs
         if: github.event_name == 'push' && github.event.ref == 'refs/heads/master' && matrix.python == '3.7'
         uses: peaceiris/actions-gh-pages@v3
