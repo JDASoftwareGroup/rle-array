@@ -58,7 +58,7 @@ jobs:
           name: docs
           path: docs/_build/html
       - name: Codecov
-        uses: codecov/codecov-action@v1.0.12
+        uses: codecov/codecov-action@v1.0.13
         with:
           # NOTE: `token` is not required, because the rle-array repo is public
           file: ./coverage.xml
