@@ -73,6 +73,7 @@ def with_jit(request: SubRequest) -> Generator[None, None, None]:
 def test_calc_lengths(positions: np.ndarray, expected: np.ndarray) -> None:
     actual = calc_lengths(positions)
     npt.assert_array_equal(actual, expected)
+    assert actual.dtype == expected.dtype
 
 
 @pytest.mark.parametrize(
@@ -132,10 +133,22 @@ def test_calc_lengths(positions: np.ndarray, expected: np.ndarray) -> None:
         ),
     ],
 )
-def test_compress(scalars: np.ndarray, data: np.ndarray, positions: np.ndarray) -> None:
+def test_compress_ok(
+    scalars: np.ndarray, data: np.ndarray, positions: np.ndarray
+) -> None:
     data_actual, positions_actual = compress(scalars)
     npt.assert_array_equal(data_actual, data)
+    assert data_actual.dtype == data.dtype
     npt.assert_array_equal(positions_actual, positions)
+    assert positions_actual.dtype == positions.dtype
+
+
+def test_compress_fail_non_1d() -> None:
+    scalars = np.array([[1, 2], [3, 4]])
+    with pytest.raises(
+        ValueError, match="Only 1-dimensional arrays can be compressed."
+    ):
+        compress(scalars)
 
 
 @pytest.mark.parametrize(
@@ -225,7 +238,9 @@ def test_concat(
 ) -> None:
     data_actual, positions_actual = concat(data_parts, positions_parts)
     npt.assert_array_equal(data_actual, data)
+    assert data_actual.dtype == data.dtype
     npt.assert_array_equal(positions_actual, positions)
+    assert positions_actual.dtype == positions.dtype
 
 
 @pytest.mark.parametrize(
@@ -271,6 +286,26 @@ def test_concat(
             # scalars
             np.array([2, np.nan, np.nan, 3, 3, 3], dtype=np.float64),
         ),
+        (
+            # dtype
+            np.array([1], dtype=np.int8),
+            # positions
+            np.array([2], dtype=POSITIONS_DTYPE),
+            # dtype
+            None,
+            # scalars
+            np.array([1, 1], dtype=np.int8),
+        ),
+        (
+            # dtype
+            np.array(["a", None, "b"], dtype=np.object_),
+            # positions
+            np.array([1, 3, 6], dtype=POSITIONS_DTYPE),
+            # dtype
+            None,
+            # scalars
+            np.array(["a", None, None, "b", "b", "b"], dtype=np.object_),
+        ),
     ],
 )
 def test_decompress(
@@ -281,6 +316,7 @@ def test_decompress(
 ) -> None:
     scalars_actual = decompress(data, positions, dtype)
     npt.assert_array_equal(scalars_actual, scalars)
+    assert scalars_actual.dtype == scalars.dtype
 
 
 @pytest.mark.parametrize(
@@ -336,6 +372,7 @@ def test_decompress(
 def test_detect_changes(scalars: np.ndarray, changes: np.ndarray) -> None:
     changes_actual = detect_changes(scalars)
     npt.assert_array_equal(changes_actual, changes)
+    assert changes_actual.dtype == changes.dtype
 
 
 @pytest.mark.parametrize(
@@ -391,7 +428,9 @@ def test_dropna(
 ) -> None:
     data_actual, positions_actual = dropna(data_before, positions_before)
     npt.assert_array_equal(data_actual, data_after)
+    assert data_actual.dtype == data_after.dtype
     npt.assert_array_equal(positions_actual, positions_after)
+    assert positions_actual.dtype == positions_after.dtype
 
 
 @pytest.mark.parametrize(
@@ -890,7 +929,9 @@ def test_find_slice(
 ) -> None:
     data_actual, positions_actual = find_slice(data_before, positions_before, s)
     npt.assert_array_equal(data_actual, data_after)
+    assert data_actual.dtype == data_after.dtype
     npt.assert_array_equal(positions_actual, positions_after)
+    assert positions_actual.dtype == positions_after.dtype
 
 
 @pytest.mark.parametrize(
@@ -1002,7 +1043,9 @@ def test_recompress(
 ) -> None:
     data_actual, positions_actual = recompress(data_before, positions_before)
     npt.assert_array_equal(data_actual, data_after)
+    assert data_actual.dtype == data_after.dtype
     npt.assert_array_equal(positions_actual, positions_after)
+    assert positions_actual.dtype == positions_after.dtype
 
 
 @pytest.mark.parametrize(
@@ -1085,7 +1128,9 @@ def test_take_no_fill_ok(
         fill_value=None,
     )
     npt.assert_array_equal(data_actual, data_after)
+    assert data_actual.dtype == data_after.dtype
     npt.assert_array_equal(positions_actual, positions_after)
+    assert positions_actual.dtype == positions_after.dtype
 
 
 @pytest.mark.parametrize(
@@ -1202,7 +1247,9 @@ def test_take_fill_ok(
         fill_value=np.nan,
     )
     npt.assert_array_equal(data_actual, data_after)
+    assert data_actual.dtype == data_after.dtype
     npt.assert_array_equal(positions_actual, positions_after)
+    assert positions_actual.dtype == positions_after.dtype
 
 
 @pytest.mark.parametrize(
@@ -1299,6 +1346,7 @@ def test_extend_positions(
 ) -> None:
     actual = extend_positions(positions1, positions2)
     np.testing.assert_array_equal(actual, expected)
+    assert actual.dtype == expected.dtype
 
 
 @pytest.mark.parametrize(
@@ -1327,3 +1375,4 @@ def test_extend_data(
 ) -> None:
     actual = extend_data(data, positions, extended_positions)
     np.testing.assert_array_equal(actual, expected)
+    assert actual.dtype == expected.dtype

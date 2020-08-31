@@ -64,3 +64,45 @@ def test_add_unhandled(array_orig: np.ndarray, array_rle: RLEArray, t: type) -> 
         array_rle.__array_ufunc__(np.add, "__call__", array_rle, other)
         is NotImplemented
     )
+
+
+def test_2d_broadcast_add(array_orig: np.ndarray, array_rle: RLEArray) -> None:
+    # ufuncs can result in high-dimensional arrays. In that case, just return a normal NumPy array.
+    other = np.vstack([array_orig, array_orig])
+    assert other.shape == (2, len(array_orig))
+
+    expected = other * array_orig
+    actual = other * array_rle
+    assert actual.dtype == expected.dtype
+    npt.assert_array_equal(actual, expected)
+
+
+def test_2d_broadcast_divmod(array_orig: np.ndarray, array_rle: RLEArray) -> None:
+    # ufuncs can result in high-dimensional arrays. In that case, just return a normal NumPy array.
+    other = np.vstack([array_orig, array_orig])
+    assert other.shape == (2, len(array_orig))
+
+    expected1, expected2 = np.divmod(other, array_orig)
+    actual1, actual2 = np.divmod(other, array_rle)
+    assert actual1.dtype == expected1.dtype
+    assert actual2.dtype == expected2.dtype
+    npt.assert_array_equal(actual1, expected1)
+    npt.assert_array_equal(actual2, expected2)
+
+
+def test_mixed_typing_mul(array_orig: np.ndarray, array_rle: RLEArray) -> None:
+    actual = array_orig * array_rle
+
+    expected = array_orig * array_orig
+    assert actual.dtype == expected.dtype
+    npt.assert_array_equal(actual, expected)
+
+
+def test_mixed_typing_divmod(array_orig: np.ndarray, array_rle: RLEArray) -> None:
+    actual1, actual2 = np.divmod(array_orig, array_rle)
+
+    expected1, expected2 = np.divmod(array_orig, array_orig)
+    assert actual1.dtype == expected1.dtype
+    assert actual2.dtype == expected2.dtype
+    npt.assert_array_equal(actual1, expected1)
+    npt.assert_array_equal(actual2, expected2)

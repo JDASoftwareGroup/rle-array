@@ -40,7 +40,13 @@ def compress(scalars: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         Data at start of reach run.
     positions:
         End positions of runs.
+
+    Raises
+    ------
+    ValueError: If non-1-dimensional arrays are compressed.
     """
+    if scalars.ndim != 1:
+        raise ValueError("Only 1-dimensional arrays can be compressed.")
     if len(scalars) == 0:
         return (scalars, np.array([], dtype=POSITIONS_DTYPE))
 
@@ -90,6 +96,24 @@ def concat(
     return (data, positions)
 
 
+@numba.jit(nopython=True, cache=True, nogil=True)
+def _inplace_repeat(
+    data: np.ndarray, positions: np.ndarray, out: np.ndarray
+) -> np.ndarray:
+    n = len(positions)
+    assert len(data) == n
+    assert n > 0
+
+    out[0 : positions[0]] = data[0]
+
+    if n == 1:
+        return
+
+    for i in range(1, n):
+        out[positions[i - 1] : positions[i]] = data[i]
+    return
+
+
 def decompress(
     data: np.ndarray, positions: np.ndarray, dtype: Optional[Any] = None
 ) -> np.ndarray:
@@ -110,8 +134,22 @@ def decompress(
     scalars:
         Scalars, decompressed.
     """
-    lengths = calc_lengths(positions)
-    return np.repeat(data.astype(dtype), lengths)
+    target_dtype = dtype if dtype is not None else data.dtype
+    if len(data) == 0:
+        return np.empty(0, dtype=target_dtype)
+
+    if dtype is not None:
+        data = data.astype(target_dtype, copy=False)
+
+    if (target_dtype != np.dtype(object)) and not np.issubdtype(
+        target_dtype, np.flexible
+    ):
+        out = np.empty(positions[-1], dtype=target_dtype)
+        _inplace_repeat(data, positions, out)
+        return out
+    else:
+        lengths = calc_lengths(positions)
+        return np.repeat(data, lengths)
 
 
 def detect_changes(scalars: np.ndarray) -> np.ndarray:

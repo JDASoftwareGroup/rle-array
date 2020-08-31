@@ -37,8 +37,8 @@ jobs:
         run: poetry run pytest
       - name: ASV
         run: |
-          poetry run asv --config ./asv_bench/asv.conf.json machine --machine travis --os unknown --arch unknown --cpu unknown --ram unknown
-          poetry run asv --config ./asv_bench/asv.conf.json run --show-stderr --environment existing --quick
+          poetry run asv machine --machine travis --os unknown --arch unknown --cpu unknown --ram unknown
+          poetry run asv run --show-stderr --environment existing --quick
       - name: Sphinx
         run: |
           poetry run python setup.py build_sphinx

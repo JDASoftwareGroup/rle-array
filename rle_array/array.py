@@ -2,7 +2,8 @@ import logging
 import operator
 import warnings
 from collections import namedtuple
-from typing import Any, Callable, Iterator, Optional, Sequence, Union
+from copy import copy
+from typing import Any, Callable, Dict, Iterator, Optional, Sequence, Tuple, Union
 from weakref import WeakSet, ref
 
 import numpy as np
@@ -10,6 +11,8 @@ import pandas as pd
 from pandas.api.extensions import ExtensionArray
 from pandas.arrays import BooleanArray, IntegerArray, StringArray
 from pandas.core import ops
+from pandas.core.algorithms import factorize, unique
+from pandas.core.arrays.boolean import coerce_to_array as coerce_to_boolean_array
 from pandas.core.dtypes.common import is_array_like
 from pandas.core.dtypes.generic import ABCIndexClass, ABCSeries
 from pandas.core.dtypes.inference import is_scalar
@@ -223,8 +226,26 @@ class RLEArray(ExtensionArray):
         self._dtype = RLEDtype(data.dtype)
         self._data = data
         self._positions = positions
+        self._setup_view_system()
+
+    def _setup_view_system(self) -> None:
+        """
+        Setup any view-related tracking parts.
+
+        Must be called after initialization or unpickling.
+        """
         self._view_anchor = _ViewAnchor(self)
         self._projection = _ViewMaster.register_first(self)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = copy(self.__dict__)
+        del state["_view_anchor"]
+        del state["_projection"]
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+        self._setup_view_system()
 
     @property
     def _lengths(self) -> Any:
@@ -243,7 +264,20 @@ class RLEArray(ExtensionArray):
         if isinstance(dtype, RLEDtype):
             dtype = dtype._dtype
 
-        scalars = np.asarray(scalars, dtype=dtype)
+        if isinstance(scalars, np.ndarray):
+            if (dtype is not None) and (dtype != scalars.dtype):
+                # some cast required
+                if dtype == np.bool_:
+                    # bool case
+                    scalars, mask = coerce_to_boolean_array(scalars)
+                    if mask.any():
+                        raise TypeError("Masked booleans are not supported")
+                else:
+                    # catch-them-all case
+                    # TODO: get rid of this unsafe cast
+                    scalars = scalars.astype(dtype)
+        else:
+            scalars = np.asarray(scalars, dtype=dtype)
         data, positions = compress(scalars)
         return RLEArray(data=data, positions=positions)
 
@@ -251,6 +285,25 @@ class RLEArray(ExtensionArray):
     def _from_factorized(cls, data: Any, original: "RLEArray") -> "RLEArray":
         _logger.debug("RLEArray._from_factorized(...)")
         return cls._from_sequence(np.asarray(data, dtype=original.dtype._dtype))
+
+    def _values_for_factorize(self) -> Tuple[np.ndarray, Any]:
+        # decompressing version of `_values_for_factorize` which is not only required for `factorize` but also for other
+        # things like `pandas.core.util.hashing.hash_array`
+        return decompress(self._data, self._positions), self.dtype.na_value
+
+    def factorize(self, na_sentinel: int = -1) -> Tuple[np.ndarray, "RLEArray"]:
+        # optimized version of `ExtensionArray.factorize`:
+        #   1. replace `_values_for_factorize` with a version that does not decompress the data
+        #   2. passing compressed data to `factorize` (instead of `_factorize_array` because that does not handle NA
+        #      values nicely)
+        #   3. decompress `codes`
+        arr = self._data
+
+        codes, uniques = factorize(arr, na_sentinel=na_sentinel)
+
+        uniques = self._from_factorized(uniques, self)
+        codes = decompress(codes, self._positions)
+        return codes, uniques
 
     def __getitem__(self, arr: Any) -> Any:
         _logger.debug("RLEArray.__getitem__(arr=%s(...))", type(arr).__name__)
@@ -263,9 +316,6 @@ class RLEArray(ExtensionArray):
             )
 
         if is_array_like(arr) or isinstance(arr, list):
-            warnings.warn(
-                "performance: __getitem__ with list is slow", PerformanceWarning
-            )
             arr = _normalize_arraylike_indexing(arr, len(self))
 
             if arr.dtype == np.bool_:
@@ -273,14 +323,19 @@ class RLEArray(ExtensionArray):
             else:
                 arr = arr.astype(int)
 
+            if len(arr) == 0:
+                return RLEArray(data=self._data[[]], positions=self._positions[[]])
+
             arr[arr < 0] += len(self)
 
-            result = np.asarray(
-                [find_single_index(self._data, self._positions, i) for i in arr],
-                dtype=self.dtype._dtype,
+            data, positions = take(
+                data=self._data,
+                positions=self._positions,
+                indices=arr,
+                allow_fill=False,
+                fill_value=self.dtype.na_value,
             )
-
-            return self._from_sequence(result)
+            return RLEArray(data=data, positions=positions)
         elif isinstance(arr, slice):
             data, positions = find_slice(self._data, self._positions, arr)
             parent_normalized = NormalizedSlice.from_slice(
@@ -387,18 +442,23 @@ class RLEArray(ExtensionArray):
 
         return decompress(self._data, self._positions, dtype)
 
-    def astype(self, dtype: Any, copy: bool = True) -> Any:
+    def astype(self, dtype: Any, copy: bool = True, casting: str = "unsafe") -> Any:
         _logger.debug("RLEArray.astype(dtype=%r, copy=%r)", dtype, copy)
         if isinstance(dtype, RLEDtype):
             if (not copy) and (dtype == self.dtype):
                 return self
             return RLEArray(
-                data=self._data.astype(dtype._dtype), positions=self._positions.copy()
+                data=self._data.astype(dtype._dtype, casting=casting),
+                positions=self._positions.copy(),
             )
         if isinstance(dtype, pd.StringDtype):
             # TODO: fast-path
             return StringArray._from_sequence([str(x) for x in self])
-        return np.array(self, dtype=dtype, copy=copy)
+
+        if casting != "unsafe":
+            return np.array(self, copy=copy).astype(dtype=dtype, casting=casting)
+        else:
+            return np.array(self, dtype=dtype, copy=copy)
 
     def _get_reduce_data(self, skipna: bool) -> Any:
         data = self._data
@@ -633,7 +693,7 @@ class RLEArray(ExtensionArray):
 
     def __array_ufunc__(
         self, ufunc: Callable[..., Any], method: str, *inputs: Any, **kwargs: Any
-    ) -> Any:
+    ) -> Union[None, "RLEArray", np.ndarray]:
         _logger.debug("RLEArray.__array_ufunc__(...)")
         out = kwargs.get("out", ())
         for x in inputs + out:
@@ -645,7 +705,9 @@ class RLEArray(ExtensionArray):
                 return NotImplemented
 
         # Defer to the implementation of the ufunc on unwrapped values.
+        inputs_has_ndarray = any(isinstance(x, np.ndarray) for x in inputs)
         inputs = tuple(np.asarray(x) if isinstance(x, RLEArray) else x for x in inputs)
+
         if out:
             kwargs["out"] = tuple(
                 np.asarray(x) if isinstance(x, RLEArray) else x for x in out
@@ -656,9 +718,17 @@ class RLEArray(ExtensionArray):
                 if isinstance(x, RLEArray):
                     x[:] = y
 
+        def maybe_from_sequence(x: np.ndarray) -> Union[RLEArray, np.ndarray]:
+            if (x.ndim == 1) and (not inputs_has_ndarray):
+                # suitable for RLE compression
+                return type(self)._from_sequence(x)
+            else:
+                # likely a broadcast operation
+                return x
+
         if type(result) is tuple:
             # multiple return values
-            return tuple(type(self)._from_sequence(x) for x in result)
+            return tuple(maybe_from_sequence(x) for x in result)
         elif method == "at":
             assert result is None
 
@@ -669,7 +739,7 @@ class RLEArray(ExtensionArray):
             return None
         else:
             # one return value
-            return type(self)._from_sequence(result)
+            return maybe_from_sequence(result)
 
     def __eq__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.eq)
@@ -698,29 +768,56 @@ class RLEArray(ExtensionArray):
     def __sub__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.sub)
 
+    def __rsub__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rsub)
+
     def __mul__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.mul)
+
+    def __rmul__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rmul)
 
     def __truediv__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.truediv)
 
+    def __rtruediv__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rtruediv)
+
     def __floordiv__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.floordiv)
+
+    def __rfloordiv__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rfloordiv)
 
     def __mod__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.mod)
 
+    def __rmod__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rmod)
+
     def __pow__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.pow)
+
+    def __rpow__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rpow)
 
     def __and__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.and_)
 
+    def __rand__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rand_)
+
     def __or__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.or_)
 
+    def __ror__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.ror_)
+
     def __xor__(self, other: Any) -> Union["RLEArray", np.ndarray]:
         return self._apply_binary_operator(other, op=operator.xor)
+
+    def __rxor__(self, other: Any) -> Union["RLEArray", np.ndarray]:
+        return self._apply_binary_operator(other, op=ops.rxor)
 
     def __pos__(self) -> "RLEArray":
         return self._apply_unary_operator(op=operator.pos)
@@ -803,8 +900,20 @@ class RLEArray(ExtensionArray):
         value: Any = None,
         method: Optional[str] = None,
         limit: Optional[int] = None,
-    ) -> Any:
+    ) -> "RLEArray":
         # TODO: fast-path
         arr = pd.Series(np.asarray(self)).array.fillna(value, method, limit).to_numpy()
         data, positions = compress(arr)
         return RLEArray(data=data, positions=positions)
+
+    def round(self, decimals: int = 0) -> "RLEArray":
+        _logger.debug("RLEArray.round(decimals=%r)", decimals)
+        new_data = self._data.round(decimals)
+        return RLEArray(*recompress(new_data, self._positions))
+
+    def unique(self) -> "RLEArray":
+        uniques = unique(self._data)
+        return RLEArray(
+            data=uniques,
+            positions=np.arange(1, 1 + len(uniques), dtype=POSITIONS_DTYPE),
+        )

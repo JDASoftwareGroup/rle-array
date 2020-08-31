@@ -62,7 +62,7 @@ poetry run pytest
 
 ### Benchmarks
 For performance critical code paths we have [asv](https://asv.readthedocs.io/) benchmarks in place in the subfolder
-`asv_bench`. To run the benchmarks a single time and receive immediate feedback run
+`benchmarks`. To run the benchmarks a single time and receive immediate feedback run:
 
 ```bash
 poetry run asv run --python=same --show-stderr

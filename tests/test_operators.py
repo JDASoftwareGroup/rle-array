@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 from _pytest.fixtures import SubRequest
 from numpy import testing as npt
+from pandas.core import ops
 
 from rle_array import RLEArray, RLEDtype
 
@@ -21,6 +22,11 @@ FBinaryBoolOperator = Callable[[Any, Any], Any]
 @pytest.fixture
 def values() -> np.ndarray:
     return np.array([2.0, 2.0, 2.0, 3.0, 3.0, 2.0, np.nan, np.nan, 1.0, 1.0])
+
+
+@pytest.fixture
+def scalar(values: np.ndarray) -> float:
+    return float(values[0])
 
 
 @pytest.fixture
@@ -47,7 +53,12 @@ def rle_series2(values: np.ndarray) -> pd.Series:
 
 @pytest.fixture
 def bool_values() -> np.ndarray:
-    return np.array([False] * 5 + [True] * 4 + [False])
+    return np.array([False] * 4 + [True] * 5 + [False])
+
+
+@pytest.fixture
+def bool_scalar(bool_values: np.ndarray) -> bool:
+    return bool(bool_values[0])
 
 
 @pytest.fixture
@@ -56,8 +67,20 @@ def uncompressed_bool_series(bool_values: np.ndarray) -> pd.Series:
 
 
 @pytest.fixture
+def uncompressed_bool_series2(bool_values: np.ndarray) -> pd.Series:
+    return pd.Series(bool_values[::-1])
+
+
+@pytest.fixture
 def rle_bool_series(bool_values: np.ndarray) -> pd.Series:
     return pd.Series(RLEArray._from_sequence(bool_values))
+
+
+@pytest.fixture
+def rle_bool_series2(bool_values: np.ndarray) -> pd.Series:
+    # TODO: Use `index=np.arange(len(bool_values)) + 1`.
+    #       For some reason, pandas casts us back to dtype=bool in that case.
+    return pd.Series(RLEArray._from_sequence(bool_values[::-1]))
 
 
 @pytest.fixture(
@@ -90,19 +113,26 @@ def unary_bool_operator(request: SubRequest) -> FUnaryBoolOperator:
 @pytest.fixture(
     params=[
         operator.add,
-        operator.mul,
-        operator.sub,
-        operator.truediv,
-        operator.floordiv,
-        operator.mod,
-        operator.pow,
         operator.iadd,
+        ops.radd,
+        operator.sub,
         operator.isub,
+        ops.rsub,
+        operator.mul,
         operator.imul,
+        ops.rmul,
+        operator.truediv,
         operator.itruediv,
+        ops.rtruediv,
+        operator.floordiv,
         operator.ifloordiv,
-        operator.ipow,
+        ops.rfloordiv,
+        operator.mod,
         operator.imod,
+        ops.rmod,
+        operator.pow,
+        operator.ipow,
+        ops.rpow,
     ],
     ids=lambda op: str(op.__name__),
 )
@@ -113,11 +143,14 @@ def binary_operator(request: SubRequest) -> FBinaryOperator:
 @pytest.fixture(
     params=[
         operator.and_,
-        operator.or_,
         operator.iand,
+        ops.rand_,
+        operator.or_,
         operator.ior,
+        ops.ror_,
         operator.xor,
         operator.ixor,
+        ops.rxor,
     ],
     ids=lambda op: str(op.__name__),
 )
@@ -128,12 +161,13 @@ def binary_bool_operator(request: SubRequest) -> FBinaryBoolOperator:
 def test_compare_scalar(
     rle_series: pd.Series,
     uncompressed_series: pd.Series,
+    scalar: float,
     compare_operator: FCompareOperator,
 ) -> None:
-    actual = compare_operator(rle_series, 2.0)
+    actual = compare_operator(rle_series, scalar)
     assert actual.dtype == RLEDtype(bool)
 
-    expected = compare_operator(uncompressed_series, 2.0).astype("RLEDtype[bool]")
+    expected = compare_operator(uncompressed_series, scalar).astype("RLEDtype[bool]")
     pd.testing.assert_series_equal(actual, expected)
 
 
@@ -168,12 +202,13 @@ def test_compare_uncompressed_series(
 def test_binary_operator_scalar(
     rle_series: pd.Series,
     uncompressed_series: pd.Series,
+    scalar: float,
     binary_operator: FBinaryOperator,
 ) -> None:
-    actual = binary_operator(rle_series, 2)
+    actual = binary_operator(rle_series, scalar)
     assert actual.dtype == RLEDtype(float)
 
-    expected = binary_operator(uncompressed_series, 2).astype("RLEDtype[float]")
+    expected = binary_operator(uncompressed_series, scalar).astype("RLEDtype[float]")
     pd.testing.assert_series_equal(actual, expected)
 
 
@@ -196,24 +231,26 @@ def test_binary_operator_rle_series(
 def test_binary_operator_uncompressed_series(
     rle_series: pd.Series,
     uncompressed_series: pd.Series,
+    uncompressed_series2: pd.Series,
     binary_operator: FBinaryOperator,
 ) -> None:
-    actual = binary_operator(rle_series, uncompressed_series)
+    actual = binary_operator(rle_series, uncompressed_series2)
     assert actual.dtype == float
 
-    expected = binary_operator(uncompressed_series, uncompressed_series)
+    expected = binary_operator(uncompressed_series, uncompressed_series2)
     pd.testing.assert_series_equal(actual, expected)
 
 
 def test_binary_bool_operator_scalar(
     rle_bool_series: pd.Series,
     uncompressed_bool_series: pd.Series,
+    bool_scalar: bool,
     binary_bool_operator: FBinaryBoolOperator,
 ) -> None:
-    actual = binary_bool_operator(rle_bool_series, True)
+    actual = binary_bool_operator(rle_bool_series, bool_scalar)
     assert actual.dtype == RLEDtype(bool)
 
-    expected = binary_bool_operator(uncompressed_bool_series, True).astype(
+    expected = binary_bool_operator(uncompressed_bool_series, bool_scalar).astype(
         RLEDtype(bool)
     )
     pd.testing.assert_series_equal(actual, expected)
@@ -221,14 +258,16 @@ def test_binary_bool_operator_scalar(
 
 def test_binary_bool_operator_rle_series(
     rle_bool_series: pd.Series,
+    rle_bool_series2: pd.Series,
     uncompressed_bool_series: pd.Series,
+    uncompressed_bool_series2: pd.Series,
     binary_bool_operator: FBinaryBoolOperator,
 ) -> None:
-    actual = binary_bool_operator(rle_bool_series, rle_bool_series)
+    actual = binary_bool_operator(rle_bool_series, rle_bool_series2)
     assert actual.dtype == RLEDtype(bool)
 
     expected = binary_bool_operator(
-        uncompressed_bool_series, uncompressed_bool_series
+        uncompressed_bool_series, uncompressed_bool_series2
     ).astype(RLEDtype(bool))
     pd.testing.assert_series_equal(actual, expected)
 
@@ -236,12 +275,13 @@ def test_binary_bool_operator_rle_series(
 def test_binary_bool_operator_uncompressed_series(
     rle_bool_series: pd.Series,
     uncompressed_bool_series: pd.Series,
+    uncompressed_bool_series2: pd.Series,
     binary_bool_operator: FBinaryBoolOperator,
 ) -> None:
-    actual = binary_bool_operator(rle_bool_series, uncompressed_bool_series)
+    actual = binary_bool_operator(rle_bool_series, uncompressed_bool_series2)
     assert actual.dtype == bool
 
-    expected = binary_bool_operator(uncompressed_bool_series, uncompressed_bool_series)
+    expected = binary_bool_operator(uncompressed_bool_series, uncompressed_bool_series2)
     pd.testing.assert_series_equal(actual, expected)
 
 

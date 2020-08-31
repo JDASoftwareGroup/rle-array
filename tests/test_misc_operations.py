@@ -25,12 +25,14 @@ pytestmark = pytest.mark.filterwarnings("ignore:performance")
     ]
 )
 def data_orig(request: SubRequest) -> pd.Series:
+    f1 = 1.2363
+    f2 = 2.6263
     if request.param == "single_int":
         return pd.Series([1], dtype=int)
     elif request.param == "single_float":
-        return pd.Series([1], dtype=float)
+        return pd.Series([f1], dtype=float)
     elif request.param == "single_float32":
-        return pd.Series([1], dtype=np.float32)
+        return pd.Series([f1], dtype=np.float32)
     elif request.param == "empty_int":
         return pd.Series([], dtype=int)
     elif request.param == "empty_float":
@@ -40,9 +42,9 @@ def data_orig(request: SubRequest) -> pd.Series:
     elif request.param == "multi_int":
         return pd.Series([1, 1, 2, 2], dtype=int)
     elif request.param == "multi_float":
-        return pd.Series([1, 1, 2, 2], dtype=float)
+        return pd.Series([f1, f1, f2, f2], dtype=float)
     elif request.param == "multi_float32":
-        return pd.Series([1, 1, 2, 2], dtype=np.float32)
+        return pd.Series([f1, f1, f2, f2], dtype=np.float32)
     else:
         raise ValueError(f"Unknown data variant: {request.param}")
 
@@ -52,23 +54,26 @@ def data_rle(data_orig: pd.Series) -> pd.Series:
     return data_orig.astype(RLEDtype(data_orig.dtype))
 
 
-@pytest.fixture(params=[0, -1, 1, -2, 2])
-def periods(request: SubRequest) -> int:
-    p = request.param
-    assert isinstance(p, int)
-    return p
-
-
-@pytest.fixture(params=[1, np.nan])
-def fill_value(request: SubRequest) -> Any:
-    return request.param
-
-
+@pytest.mark.parametrize("periods", [0, -1, 1, -2, 2])
+@pytest.mark.parametrize("fill_value", [1, np.nan])
 def test_shift(
     data_orig: pd.Series, data_rle: pd.Series, periods: int, fill_value: Any
 ) -> None:
     result_orig = data_orig.shift(periods=periods, fill_value=fill_value)
     result_rle = data_rle.shift(periods=periods, fill_value=fill_value)
+
+    assert result_rle.dtype == RLEDtype(result_orig.dtype)
+
+    result_converted = result_rle.astype(result_rle.dtype._dtype)
+    pdt.assert_series_equal(result_orig, result_converted)
+
+
+@pytest.mark.parametrize("decimals", [0, 1, 2, 3, 4])
+def test_round(data_orig: pd.Series, data_rle: pd.Series, decimals: int) -> None:
+    result_orig = data_orig.round(decimals=decimals)
+    result_rle = data_rle.round(decimals=decimals)
+
+    assert result_rle.dtype == RLEDtype(result_orig.dtype)
 
     result_converted = result_rle.astype(result_rle.dtype._dtype)
     pdt.assert_series_equal(result_orig, result_converted)

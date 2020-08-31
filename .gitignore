@@ -7,7 +7,8 @@
 __pycache__/
 build/
 coverage.xml
-poetry.lock
 dist/
 docs/_build/
 docs/_rst/
+pip-wheel-metadata/
+poetry.lock
