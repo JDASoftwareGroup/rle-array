@@ -75,7 +75,7 @@
 
 <dl class="py method">
 <dt id="rle_array.RLEArray.astype">
-<code class="sig-name descname">astype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span></em>, <em class="sig-param"><span class="n">copy</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.RLEArray.astype" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">astype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dtype</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span></em>, <em class="sig-param"><span class="n">copy</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">casting</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">str</a></span> <span class="o">=</span> <span class="default_value">'unsafe'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.RLEArray.astype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cast to a NumPy array with ‘dtype’.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -130,8 +130,43 @@ new dtype.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt id="rle_array.RLEArray.factorize">
+<code class="sig-name descname">factorize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">na_sentinel</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">int</a></span> <span class="o">=</span> <span class="default_value">- 1</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Tuple</a><span class="p">[</span><a class="reference external" href="#" title="">numpy.ndarray</a><span class="p">, </span><a class="reference internal" href="rle_array.array.html#rle_array.array.RLEArray" title="rle_array.array.RLEArray">rle_array.array.RLEArray</a><span class="p">]</span><a class="headerlink" href="#rle_array.RLEArray.factorize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode the extension array as an enumerated type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>na_sentinel</strong> (<a class="reference external" href="#" title=""><em>int</em></a><em>, </em><a class="reference external" href="#" title=""><em>default -1</em></a>) – Value to use in the <cite>codes</cite> array to indicate missing values.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul>
+<li><p><strong>codes</strong> (<em>ndarray</em>) – An integer NumPy array that’s an indexer into the original
+ExtensionArray.</p></li>
+<li><p><strong>uniques</strong> (<em>ExtensionArray</em>) – An ExtensionArray containing the unique values of <cite>self</cite>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>uniques will <em>not</em> contain an entry for the NA value of
+the ExtensionArray if there are any missing values present
+in <cite>self</cite>.</p>
+</div>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#rle_array.RLEArray.factorize" title="rle_array.RLEArray.factorize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">factorize()</span></code></a></dt><dd><p>Top-level factorize method that dispatches here.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p><a class="reference external" href="#" title=""><code class="xref py py-meth docutils literal notranslate"><span class="pre">pandas.factorize()</span></code></a> offers a <cite>sort</cite> keyword as well.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="rle_array.RLEArray.fillna">
-<code class="sig-name descname">fillna</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">method</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">limit</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.RLEArray.fillna" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fillna</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">method</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">limit</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="rle_array.array.html#rle_array.array.RLEArray" title="rle_array.array.RLEArray">rle_array.array.RLEArray</a><a class="headerlink" href="#rle_array.RLEArray.fillna" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill NA/NaN values using the specified method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -217,6 +252,11 @@ returned.</p>
 <dl class="py method">
 <dt id="rle_array.RLEArray.prod">
 <code class="sig-name descname">prod</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">skipna</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">axis</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Any</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">Any</a><a class="headerlink" href="#rle_array.RLEArray.prod" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="rle_array.RLEArray.round">
+<code class="sig-name descname">round</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">decimals</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="rle_array.array.html#rle_array.array.RLEArray" title="rle_array.array.RLEArray">rle_array.array.RLEArray</a><a class="headerlink" href="#rle_array.RLEArray.round" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -346,6 +386,20 @@ extension array to object dtype. This uses the helper method
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_sequence</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rle_array.RLEArray.unique">
+<code class="sig-name descname">unique</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="rle_array.array.html#rle_array.array.RLEArray" title="rle_array.array.RLEArray">rle_array.array.RLEArray</a><a class="headerlink" href="#rle_array.RLEArray.unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the ExtensionArray of unique values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>uniques</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="#" title="">ExtensionArray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
