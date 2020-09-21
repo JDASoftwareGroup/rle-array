@@ -8,8 +8,35 @@ on:
       - v*
   pull_request:
 
+env:
+    MASTER_PYTHON: "3.8"
+
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python ${{ env.MASTER_PYTHON }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.MASTER_PYTHON }}
+      - name: Install Poetry Itself
+        run: pip install poetry
+      - name: Poetry Install
+        run: poetry install
+      - name: Flake8
+        run: poetry run flake8
+      - name: Mypy
+        run: poetry run mypy .
+      - name: Black
+        run: poetry run black --check .
+      - name: Isort
+        run: poetry run isort --check-only .
+      - name: Shellcheck
+        run: shellcheck scripts/*.sh
+
+  test:
     strategy:
       matrix:
         python: ["3.6", "3.7", "3.8"]
@@ -25,52 +52,71 @@ jobs:
         run: pip install poetry
       - name: Poetry Install
         run: poetry install
-      - name: Flake8
-        run: poetry run flake8
-      - name: Mypy
-        run: poetry run mypy .
-      - name: Black
-        run: poetry run black --check .
-      - name: Isort
-        run: poetry run isort --check-only .
       - name: Pytest
         run: poetry run pytest
       - name: ASV
         run: |
           poetry run asv machine --machine travis --os unknown --arch unknown --cpu unknown --ram unknown
           poetry run asv run --show-stderr --environment existing --quick
-      - name: Sphinx
-        run: |
-          poetry run python setup.py build_sphinx
-          touch ./docs/_build/html/.nojekyll
-      - name: Build
-        run: poetry build
-      - name: Shellcheck
-        run: shellcheck scripts/*.sh
-      - name: Preserve Dist
-        uses: actions/upload-artifact@v2.1.4
-        with:
-          name: dist
-          path: dist
-      - name: Preserve Docs
-        uses: actions/upload-artifact@v2.1.4
-        with:
-          name: docs
-          path: docs/_build/html
       - name: Codecov
         uses: codecov/codecov-action@v1.0.13
         with:
           # NOTE: `token` is not required, because the rle-array repo is public
           file: ./coverage.xml
           name: pytest-${{ runner.OS }}-${{ matrix.python }}
-      - name: Publish to PyPI
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') && matrix.python == '3.7'
-        run: poetry publish
-        env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python ${{ env.MASTER_PYTHON }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.MASTER_PYTHON }}
+      - name: Install Poetry Itself
+        run: pip install poetry
+      - name: Poetry Install
+        run: poetry install
+      - name: Sphinx
+        run: |
+          poetry run python setup.py build_sphinx
+          touch ./docs/_build/html/.nojekyll
+      - name: Preserve Docs
+        uses: actions/upload-artifact@v2.1.4
+        with:
+          name: docs
+          path: docs/_build/html
       - name: Deploy Docs
-        if: github.event_name == 'push' && github.event.ref == 'refs/heads/master' && matrix.python == '3.7'
+        if: github.event_name == 'push' && github.event.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/_build/html
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [lint, test, docs]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python ${{ env.MASTER_PYTHON }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.MASTER_PYTHON }}
+      - name: Install Poetry Itself
+        run: pip install poetry
+      - name: Poetry Install
+        run: poetry install
+      - name: Build
+        run: poetry build
+      - name: Preserve Dist
+        uses: actions/upload-artifact@v2.1.4
+        with:
+          name: dist
+          path: dist
+      - name: Publish to PyPI
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+        run: poetry publish
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
