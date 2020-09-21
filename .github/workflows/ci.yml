@@ -9,7 +9,8 @@ on:
   pull_request:
 
 env:
-    MASTER_PYTHON: "3.8"
+  IS_TAG: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')}}
+  MASTER_PYTHON: "3.8"
 
 jobs:
   lint:
@@ -113,13 +114,35 @@ jobs:
         run: poetry install
       - name: Build
         run: poetry build
+      - name: Prepare Release Notes
+        run: awk 'BEGIN{found=0} {if (match($0, "==============")) {if (found == 1) exit; found=1}; if (found == 1) {print last}; last=$0}' CHANGES.rst > release_notes.rst
+      - name: Create Release Notes
+        uses: docker://pandoc/core:2.9
+        with:
+          args: --from=rst --to=markdown -o release_notes.md release_notes.rst
       - name: Preserve Dist
         uses: actions/upload-artifact@v2.1.4
         with:
           name: dist
           path: dist
+      - name: Preserve Release Notes
+        uses: actions/upload-artifact@v2.1.4
+        with:
+          name: release_notes.md
+          path: release_notes.md
       - name: Publish to PyPI
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+        if: env.IS_TAG == 'true'
         run: poetry publish
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+      - name: Create GitHub Release
+        if: env.IS_TAG == 'true'
+        uses: actions/create-release@v1.1.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: rle-array ${{ github.ref }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
