@@ -4,6 +4,7 @@ from typing import Optional, Union
 import numpy as np
 import pandas as pd
 from pandas.api.extensions import ExtensionDtype
+from pandas.errors import PerformanceWarning
 
 from .array import RLEArray
 from .dtype import RLEDtype
@@ -98,5 +99,32 @@ def auto_convert_to_rle(
                         array_target = array_rle
 
         data[col] = array_target
+
+    return pd.DataFrame(data, index=index)
+
+
+def decompress(df: pd.DataFrame, threshold: Optional[float] = None) -> pd.DataFrame:
+    """
+    Decompress all RLE columns in the provided DataFrame.
+
+    Parameters
+    ----------
+    df
+        Input DataFrame. This input data MIGHT not be copied!
+    """
+    index = df.index
+
+    data = {}
+    for col in df.columns:
+        series = df[col]
+        array = series.array
+        dtype = series.dtype
+
+        if _is_rle_dtype(dtype):
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=PerformanceWarning)
+                array = array.astype(dtype._dtype)
+
+        data[col] = array
 
     return pd.DataFrame(data, index=index)
