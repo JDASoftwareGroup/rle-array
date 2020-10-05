@@ -103,7 +103,7 @@ def auto_convert_to_rle(
     return pd.DataFrame(data, index=index)
 
 
-def decompress(df: pd.DataFrame, threshold: Optional[float] = None) -> pd.DataFrame:
+def decompress(df: pd.DataFrame) -> pd.DataFrame:
     """
     Decompress all RLE columns in the provided DataFrame.
 
