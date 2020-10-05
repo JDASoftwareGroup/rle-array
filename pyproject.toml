@@ -34,8 +34,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.6.1,<3.9"
-llvmlite = "<=0.33.0"  # installing with poetry seems broken for 0.34.0rc1
-numba = ">=0.45"
+numba = ">=0.51.2"
 numpy = ">=1.17"
 pandas = ">=1.1,<1.2"
 
