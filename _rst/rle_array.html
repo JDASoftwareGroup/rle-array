@@ -490,19 +490,30 @@ instances of <cite>type</cite>.</p>
 
 <dl class="py function">
 <dt id="rle_array.auto_convert_to_rle">
-<code class="sig-name descname">auto_convert_to_rle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">pandas.core.frame.DataFrame</a></span></em>, <em class="sig-param"><span class="n">threshold</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">float</a></span> <span class="o">=</span> <span class="default_value">1.0</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">pandas.core.frame.DataFrame</a><a class="headerlink" href="#rle_array.auto_convert_to_rle" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">auto_convert_to_rle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">pandas.core.frame.DataFrame</a></span></em>, <em class="sig-param"><span class="n">threshold</span><span class="p">:</span> <span class="n"><a class="reference external" href="#" title="">Optional</a><span class="p">[</span><a class="reference external" href="#" title="">float</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="#" title="">pandas.core.frame.DataFrame</a><a class="headerlink" href="#rle_array.auto_convert_to_rle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Auto-convert given DataFrame to RLE compressed DataFrame.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Datetime columns are currently not compressed due to pandas not supporting them.</p>
 </div>
+<p>Please note that RLE can, under some circumstances, require MORE memory than the uncompressed data. It is not
+advisable to set <code class="docutils literal notranslate"><span class="pre">threshold</span></code> to a value larger than 1 except for testing purposes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> – Input DataFrame, may already contain RLE columns.</p></li>
-<li><p><strong>threshold</strong> – Compression threshold (<code class="docutils literal notranslate"><span class="pre">1</span></code> compresses all, <code class="docutils literal notranslate"><span class="pre">0.5</span></code> compresses if at least 50% memory are safed, <code class="docutils literal notranslate"><span class="pre">0.0</span></code> does
-not compress at all).</p></li>
+<li><p><strong>df</strong> – Input DataFrame, may already contain RLE columns. This input data MIGHT not be copied!</p></li>
+<li><p><strong>threshold</strong> – <p>Compression threshold, e.g.:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: compress all</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1.0</span></code> compresses only if RLE does NOT take up more space</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0.5</span></code> compresses if at least 50% memory are safed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code> do not compress at all</p></li>
 </ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="#" title=""><strong>ValueError</strong></a> – If threshold is negative.</p>
 </dd>
 </dl>
 </dd></dl>
