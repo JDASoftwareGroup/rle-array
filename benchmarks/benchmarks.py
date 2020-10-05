@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from pandas.errors import PerformanceWarning
 
+from rle_array.autoconversion import auto_convert_to_rle, decompress
 from rle_array.testing import const_col, dim_col, generate_test_dataframe
 
 
@@ -28,6 +29,23 @@ class Base:
         with warnings.catch_warnings():
             warnings.simplefilter(action="ignore", category=PerformanceWarning)
             yield
+
+
+class TimeAutoConversion(Base):
+    def time_auto_convert_to_rle_compress_all(self) -> None:
+        auto_convert_to_rle(self.df_baseline)
+
+    def time_auto_convert_to_rle_no_compression_allowed(self) -> None:
+        auto_convert_to_rle(self.df_baseline, 0.0)
+
+    def time_auto_convert_to_rle_already_compressed(self) -> None:
+        auto_convert_to_rle(self.df_rle)
+
+    def time_decompress_compressed(self) -> None:
+        decompress(self.df_rle)
+
+    def time_decompress_noop(self) -> None:
+        decompress(self.df_baseline)
 
 
 class TimeCompression(Base):

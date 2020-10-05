@@ -1,9 +1,11 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 import pytest
 from pandas import testing as pdt
 
-from rle_array.autoconversion import auto_convert_to_rle
+from rle_array.autoconversion import auto_convert_to_rle, decompress
 from rle_array.dtype import RLEDtype
 
 pytestmark = pytest.mark.filterwarnings("ignore:performance")
@@ -28,7 +30,7 @@ pytestmark = pytest.mark.filterwarnings("ignore:performance")
                 }
             ),
             # threshold
-            1.0,
+            None,
             # expected
             pd.DataFrame(
                 {
@@ -48,13 +50,45 @@ pytestmark = pytest.mark.filterwarnings("ignore:performance")
             # orig
             pd.DataFrame(
                 {
+                    "int64": pd.Series([1], dtype=np.int64),
+                    "int32": pd.Series([1], dtype=np.int32),
+                    "uint64": pd.Series([1], dtype=np.uint64),
+                    "float64": pd.Series([1.2], dtype=np.float64),
+                    "bool": pd.Series([True], dtype=np.bool_),
+                    "object": pd.Series(["foo"], dtype=np.object_),
+                    "datetime64": pd.Series(
+                        [pd.Timestamp("2020-01-01")], dtype="datetime64[ns]"
+                    ),
+                }
+            ),
+            # threshold
+            2.0,
+            # expected
+            pd.DataFrame(
+                {
+                    "int64": pd.Series([1], dtype=RLEDtype(np.int64)),
+                    "int32": pd.Series([1], dtype=np.int32),
+                    "uint64": pd.Series([1], dtype=RLEDtype(np.uint64)),
+                    "float64": pd.Series([1.2], dtype=RLEDtype(np.float64)),
+                    "bool": pd.Series([True], dtype=np.bool_),
+                    "object": pd.Series(["foo"]).astype(RLEDtype(np.object_)),
+                    "datetime64": pd.Series(
+                        [pd.Timestamp("2020-01-01")], dtype="datetime64[ns]"
+                    ),
+                }
+            ),
+        ),
+        (
+            # orig
+            pd.DataFrame(
+                {
                     "single_value": pd.Series([1, 1, 1, 1, 1, 1], dtype=np.int64),
                     "two_values": pd.Series([1, 1, 1, 2, 2, 2], dtype=np.int64),
                     "increasing": pd.Series([1, 2, 3, 4, 5, 6], dtype=np.int64),
                 }
             ),
             # threshold
-            1.0,
+            None,
             # expected
             pd.DataFrame(
                 {
@@ -178,10 +212,27 @@ pytestmark = pytest.mark.filterwarnings("ignore:performance")
                 }
             ),
         ),
+        (
+            # orig
+            pd.DataFrame({"x": pd.Series(range(10), dtype=np.int64)}),
+            # threshold
+            1.0,
+            # expected
+            pd.DataFrame({"x": pd.Series(range(10), dtype=np.int64)}),
+        ),
+        (
+            # orig
+            pd.DataFrame(),
+            # threshold
+            None,
+            # expected
+            pd.DataFrame(),
+        ),
     ],
 )
+@pytest.mark.filterwarnings("ignore:.*would use a DatetimeBlock:UserWarning")
 def test_auto_convert_to_rle_ok(
-    orig: pd.DataFrame, threshold: float, expected: pd.DataFrame
+    orig: pd.DataFrame, threshold: Optional[float], expected: pd.DataFrame
 ) -> None:
     actual = auto_convert_to_rle(orig, threshold)
     pdt.assert_frame_equal(actual, expected)
@@ -201,19 +252,101 @@ def test_datetime_warns() -> None:
     assert len(record) == 2
     assert (
         str(record[0].message)
-        == "Column d1 is would use a DatetimeBlock and can currently not be RLE compressed."
+        == "Column d1 would use a DatetimeBlock and can currently not be RLE compressed."
     )
     assert (
         str(record[1].message)
-        == "Column d2 is would use a DatetimeBlock and can currently not be RLE compressed."
+        == "Column d2 would use a DatetimeBlock and can currently not be RLE compressed."
     )
 
 
 def test_auto_convert_to_rle_threshold_out_of_range() -> None:
     df = pd.DataFrame({"x": [1]})
 
-    with pytest.raises(ValueError, match=r"threshold \(-0.1\) must be in \[0, 1\]"):
+    with pytest.raises(ValueError, match=r"threshold \(-0.1\) must be non-negative"):
         auto_convert_to_rle(df, -0.1)
 
-    with pytest.raises(ValueError, match=r"threshold \(1.1\) must be in \[0, 1\]"):
-        auto_convert_to_rle(df, 1.1)
+
+@pytest.mark.parametrize(
+    "orig, expected",
+    [
+        (
+            # orig
+            pd.DataFrame(
+                {
+                    "int64": pd.Series([1], dtype=RLEDtype(np.int64)),
+                    "int32": pd.Series([1], dtype=RLEDtype(np.int32)),
+                    "uint64": pd.Series([1], dtype=RLEDtype(np.uint64)),
+                    "float64": pd.Series([1.2], dtype=RLEDtype(np.float64)),
+                    "bool": pd.Series([True], dtype=RLEDtype(np.bool_)),
+                    "object": pd.Series(["foo"]).astype(RLEDtype(np.object_)),
+                    "datetime64": pd.Series(
+                        [pd.Timestamp("2020-01-01")], dtype="datetime64[ns]"
+                    ),
+                }
+            ),
+            # expected
+            pd.DataFrame(
+                {
+                    "int64": pd.Series([1], dtype=np.int64),
+                    "int32": pd.Series([1], dtype=np.int32),
+                    "uint64": pd.Series([1], dtype=np.uint64),
+                    "float64": pd.Series([1.2], dtype=np.float64),
+                    "bool": pd.Series([True], dtype=np.bool_),
+                    "object": pd.Series(["foo"], dtype=np.object_),
+                    "datetime64": pd.Series(
+                        [pd.Timestamp("2020-01-01")], dtype="datetime64[ns]"
+                    ),
+                }
+            ),
+        ),
+        (
+            # orig
+            pd.DataFrame(
+                {
+                    "int64": pd.Series([1], dtype=np.int64),
+                    "int32": pd.Series([1], dtype=np.int32),
+                    "uint64": pd.Series([1], dtype=np.uint64),
+                    "float64": pd.Series([1.2], dtype=np.float64),
+                    "bool": pd.Series([True], dtype=np.bool_),
+                    "object": pd.Series(["foo"], dtype=np.object_),
+                    "datetime64": pd.Series(
+                        [pd.Timestamp("2020-01-01")], dtype="datetime64[ns]"
+                    ),
+                }
+            ),
+            # expected
+            pd.DataFrame(
+                {
+                    "int64": pd.Series([1], dtype=np.int64),
+                    "int32": pd.Series([1], dtype=np.int32),
+                    "uint64": pd.Series([1], dtype=np.uint64),
+                    "float64": pd.Series([1.2], dtype=np.float64),
+                    "bool": pd.Series([True], dtype=np.bool_),
+                    "object": pd.Series(["foo"], dtype=np.object_),
+                    "datetime64": pd.Series(
+                        [pd.Timestamp("2020-01-01")], dtype="datetime64[ns]"
+                    ),
+                }
+            ),
+        ),
+        (
+            # orig
+            pd.DataFrame(),
+            # expected
+            pd.DataFrame(),
+        ),
+    ],
+)
+def test_decompress_ok(orig: pd.DataFrame, expected: pd.DataFrame) -> None:
+    actual = decompress(orig)
+    pdt.assert_frame_equal(actual, expected)
+
+
+def test_decompress_does_not_warn() -> None:
+    df = pd.DataFrame({"x": pd.Series([1] * 10, dtype=RLEDtype(np.int64))})
+
+    with pytest.warns(None) as record:
+        decompress(df)
+
+    assert len(record) == 0
