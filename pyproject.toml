@@ -1,8 +1,8 @@
 [build-system]
 requires = [
-    "poetry>=0.12",
+    "poetry-core>=1.0.0",
 ]
-build-backend = "poetry.masonry.api"
+build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
@@ -34,8 +34,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.6.1,<3.9"
-llvmlite = "<=0.33.0"  # installing with poetry seems broken for 0.34.0rc1
-numba = ">=0.45"
+numba = ">=0.51.2"
 numpy = ">=1.17"
 pandas = ">=1.1,<1.2"
 
