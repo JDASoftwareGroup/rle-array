@@ -62,7 +62,7 @@ jobs:
           poetry run asv machine --machine travis --os unknown --arch unknown --cpu unknown --ram unknown
           poetry run asv run --show-stderr --environment existing --quick
       - name: Codecov
-        uses: codecov/codecov-action@v1.0.14
+        uses: codecov/codecov-action@v1.0.15
         with:
           # NOTE: `token` is not required, because the rle-array repo is public
           file: ./coverage.xml
