@@ -547,7 +547,11 @@ class RLEArray(ExtensionArray):
         data = np.asarray(self)
         if skipna:
             data = data[pd.notnull(data)]
-        return np.median(data)
+
+        if len(data) == 0:
+            return self.dtype.na_value
+        else:
+            return np.median(data)
 
     def min(self, skipna: bool = True, axis: Optional[int] = 0, out: Any = None) -> Any:
         _logger.debug("RLEArray.min(skipna=%r)", skipna)
